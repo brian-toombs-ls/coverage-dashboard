@@ -32,4 +32,5 @@ jobs:
           git add coverage-history.csv
           git diff --staged --quiet && echo "No changes to commit" && exit 0
           git commit -m "chore: coverage update $(date +%Y-%m-%d)"
+          git pull --rebase origin main
           git push
