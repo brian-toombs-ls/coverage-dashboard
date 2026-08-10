@@ -1,1 +1,16 @@
 date,repo,coverage_pct,source
+2026-08-10,LegalSifter/api-documents,,unavailable
+2026-08-10,LegalSifter/api-tickets,,unavailable
+2026-08-10,LegalSifter/api-settings,,unavailable
+2026-08-10,LegalSifter/automator,,unavailable
+2026-08-10,LegalSifter/go-mail,,unavailable
+2026-08-10,LegalSifter/ms-auth,,unavailable
+2026-08-10,LegalSifter/ms-billing,,unavailable
+2026-08-10,LegalSifter/ms-chat,,unavailable
+2026-08-10,LegalSifter/ms-playbook,,unavailable
+2026-08-10,LegalSifter/ms-profile,,unavailable
+2026-08-10,LegalSifter/ms-project,,unavailable
+2026-08-10,LegalSifter/ms-search,,unavailable
+2026-08-10,LegalSifter/ms-sign,,unavailable
+2026-08-10,LegalSifter/ms-storage,,unavailable
+2026-08-10,LegalSifter/workflows,,unavailable
