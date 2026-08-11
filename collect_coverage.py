@@ -38,6 +38,8 @@ REPOSITORIES = [
     "LegalSifter/ms-search",
     "LegalSifter/ms-sign",
     "LegalSifter/ms-storage",
+    "LegalSifter/ms-share",
+    "LegalSifter/go-microservices",
     "LegalSifter/workflows",
 ]
 
