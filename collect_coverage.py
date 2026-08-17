@@ -269,25 +269,35 @@ def fetch_coverage(repo, token):
 # CSV helpers
 # ---------------------------------------------------------------------------
 
-def load_last_known(csv_path):
-    """Return dict of repo → last recorded coverage_pct."""
-    last = {}
+SOURCE_RANK = {"fresh": 0, "carried_forward": 1, "unavailable": 2, "": 3}
+
+
+def load_csv(csv_path):
+    """Load all rows and deduplicate: one row per (date, repo), best source wins."""
     if not os.path.exists(csv_path):
-        return last
+        return {}
+
+    # key: (date, repo) → best row seen so far
+    best = {}
     with open(csv_path, newline="") as f:
         for row in csv.DictReader(f):
-            if row.get("coverage_pct") not in ("", "N/A", None):
-                last[row["repo"]] = float(row["coverage_pct"])
-    return last
+            key = (row["date"], row["repo"])
+            existing = best.get(key)
+            if existing is None:
+                best[key] = row
+            else:
+                if SOURCE_RANK.get(row["source"], 9) < SOURCE_RANK.get(existing["source"], 9):
+                    best[key] = row
+    return best
 
 
-def append_rows(csv_path, rows):
-    write_header = not os.path.exists(csv_path)
-    with open(csv_path, "a", newline="") as f:
+def write_csv(csv_path, rows_by_key):
+    """Write all rows sorted by date then repo, replacing the file."""
+    sorted_rows = [v for _, v in sorted(rows_by_key.items())]
+    with open(csv_path, "w", newline="") as f:
         writer = csv.DictWriter(f, fieldnames=CSV_COLUMNS)
-        if write_header:
-            writer.writeheader()
-        writer.writerows(rows)
+        writer.writeheader()
+        writer.writerows(sorted_rows)
 
 
 # ---------------------------------------------------------------------------
@@ -301,13 +311,31 @@ def main():
         sys.exit(1)
 
     today = date.today().isoformat()
-    last_known = load_last_known(CSV_PATH)
-    rows = []
 
+    # Load and deduplicate existing history
+    rows_by_key = load_csv(CSV_PATH)
+
+    # Derive last known values from historical fresh/carried_forward entries
+    last_known = {}
+    for (d, repo), row in rows_by_key.items():
+        if row.get("coverage_pct") not in ("", None):
+            last_known[repo] = float(row["coverage_pct"])
+
+    # Which repos already have a fresh entry for today — skip them on re-run
+    already_fresh = {
+        repo for (d, repo), row in rows_by_key.items()
+        if d == today and row.get("source") == "fresh"
+    }
+
+    new_count = 0
     for repo in REPOSITORIES:
         short = repo.split("/")[-1]
-        print(f"  {short}... ", end="", flush=True)
 
+        if repo in already_fresh:
+            print(f"  {short}... skipped (already fresh today)")
+            continue
+
+        print(f"  {short}... ", end="", flush=True)
         pct = fetch_coverage(repo, token)
 
         if pct is not None:
@@ -321,15 +349,16 @@ def main():
             source = "unavailable"
             print("N/A")
 
-        rows.append({
+        rows_by_key[(today, repo)] = {
             "date": today,
             "repo": repo,
             "coverage_pct": f"{pct:.2f}" if pct is not None else "",
             "source": source,
-        })
+        }
+        new_count += 1
 
-    append_rows(CSV_PATH, rows)
-    print(f"\nAppended {len(rows)} rows to {CSV_PATH}")
+    write_csv(CSV_PATH, rows_by_key)
+    print(f"\nWrote {len(rows_by_key)} total rows ({new_count} updated today)")
 
 
 if __name__ == "__main__":
