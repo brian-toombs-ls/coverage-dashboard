@@ -41,7 +41,16 @@ REPOSITORIES = [
     "LegalSifter/ms-share",
     "LegalSifter/go-microservices",
     "LegalSifter/workflows",
+    "LegalSifter/ls-review-fe",
+    "LegalSifter/control-bff",
 ]
+
+# Repos that produce coverage-summary.json (Istanbul/Vitest json-summary reporter)
+# Parsed as JSON rather than HTML — accurate and unambiguous.
+ISTANBUL_REPOS = {
+    "LegalSifter/ls-review-fe",
+    "LegalSifter/control-bff",
+}
 
 JACOCO_REPOS = {
     "LegalSifter/ms-auth",
@@ -109,6 +118,17 @@ def download_artifact(url, token):
 # Coverage extraction
 # ---------------------------------------------------------------------------
 
+def extract_istanbul_json(json_bytes):
+    """Parse coverage-summary.json produced by Istanbul json-summary reporter.
+    Returns lines.pct from the 'total' key — unambiguous, no HTML scraping."""
+    try:
+        data = json.loads(json_bytes)
+        total = data.get("total", {})
+        return float(total["lines"]["pct"])
+    except Exception:
+        return None
+
+
 def extract_gocov(html):
     patterns = [
         r'<div\s+id=["\']totalcov["\'][^>]*>\s*(\d+(?:\.\d+)?)\s*%\s*</div>',
@@ -138,8 +158,17 @@ def extract_jacoco(html):
 
 def coverage_from_zip(zip_bytes, repo):
     is_jacoco = repo in JACOCO_REPOS
+    is_istanbul = repo in ISTANBUL_REPOS
     with zipfile.ZipFile(io.BytesIO(zip_bytes)) as zf:
         names = zf.namelist()
+
+        # Istanbul repos: parse coverage-summary.json directly — no HTML scraping needed
+        if is_istanbul:
+            for name in names:
+                if name.endswith("coverage-summary.json"):
+                    pct = extract_istanbul_json(zf.read(name))
+                    if pct is not None:
+                        return pct
 
         if is_jacoco:
             jacoco_paths = [

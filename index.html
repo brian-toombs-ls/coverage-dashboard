@@ -28,15 +28,16 @@
 
     h1 { font-size: 1.5rem; font-weight: 700; color: #f8fafc; }
     .subtitle { font-size: 0.875rem; color: #64748b; margin-top: 0.25rem; }
-
     .meta { font-size: 0.8rem; color: #475569; text-align: right; }
 
-    .stats-row {
+    /* ── KPI Row ── */
+    .kpi-row {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      grid-template-columns: 2fr 1fr 1fr 1fr 1fr;
       gap: 1rem;
       margin-bottom: 2rem;
     }
+    @media (max-width: 900px) { .kpi-row { grid-template-columns: 1fr 1fr; } }
 
     .stat-card {
       background: #1e2130;
@@ -45,18 +46,34 @@
       padding: 1.25rem;
     }
 
-    .stat-label { font-size: 0.75rem; color: #64748b; text-transform: uppercase; letter-spacing: 0.05em; }
-    .stat-value { font-size: 2rem; font-weight: 700; margin-top: 0.25rem; }
-
-    .charts-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 1.5rem;
-      margin-bottom: 2rem;
+    .stat-card.hero {
+      background: #1a1f35;
+      border-color: #3b4268;
     }
 
-    @media (max-width: 900px) { .charts-grid { grid-template-columns: 1fr; } }
+    .stat-label {
+      font-size: 0.75rem;
+      color: #64748b;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
 
+    .stat-value {
+      font-size: 2rem;
+      font-weight: 700;
+      margin-top: 0.25rem;
+      line-height: 1;
+    }
+
+    .stat-card.hero .stat-value { font-size: 2.5rem; }
+
+    .stat-sub {
+      font-size: 0.75rem;
+      color: #475569;
+      margin-top: 0.35rem;
+    }
+
+    /* ── Cards ── */
     .card {
       background: #1e2130;
       border: 1px solid #2d3348;
@@ -64,16 +81,108 @@
       padding: 1.25rem;
     }
 
-    .card h2 { font-size: 0.9rem; font-weight: 600; color: #94a3b8; margin-bottom: 1rem; text-transform: uppercase; letter-spacing: 0.05em; }
+    .card h2 {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: #94a3b8;
+      margin-bottom: 1rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
 
-    .chart-wrap { position: relative; height: 280px; }
+    /* ── Layout rows ── */
+    .charts-primary {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 1.5rem;
+      margin-bottom: 1.5rem;
+    }
 
+    .charts-secondary {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+
+    @media (max-width: 900px) {
+      .charts-primary, .charts-secondary { grid-template-columns: 1fr; }
+    }
+
+    .chart-wrap { position: relative; }
+    .chart-wrap-bar { height: 320px; }
+    .chart-wrap-donut { height: 260px; }
+    .chart-wrap-line { height: 220px; }
+
+    /* ── Needs Attention ── */
+    .attention-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 0.75rem;
+      margin-top: 0.5rem;
+    }
+
+    .attention-item {
+      background: #151925;
+      border: 1px solid #2d3348;
+      border-radius: 6px;
+      padding: 0.75rem 1rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+    }
+
+    .attention-item.below { border-left: 3px solid #f87171; }
+    .attention-item.no-data { border-left: 3px solid #475569; }
+
+    .attention-name { font-size: 0.85rem; font-weight: 600; color: #e2e8f0; }
+    .attention-value { font-size: 1.25rem; font-weight: 700; }
+    .attention-sub { font-size: 0.7rem; color: #64748b; }
+
+    /* ── Progress bar ── */
+    .progress-wrap {
+      background: #0f1117;
+      border-radius: 999px;
+      height: 6px;
+      overflow: hidden;
+      margin-top: 4px;
+    }
+
+    .progress-bar {
+      height: 100%;
+      border-radius: 999px;
+      transition: width 0.3s;
+    }
+
+    /* ── Table ── */
     table { width: 100%; border-collapse: collapse; font-size: 0.875rem; }
-    th { text-align: left; padding: 0.5rem 0.75rem; color: #64748b; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; border-bottom: 1px solid #2d3348; }
-    td { padding: 0.6rem 0.75rem; border-bottom: 1px solid #1a1f2e; }
+    th {
+      text-align: left;
+      padding: 0.5rem 0.75rem;
+      color: #64748b;
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      border-bottom: 1px solid #2d3348;
+      cursor: pointer;
+      user-select: none;
+      white-space: nowrap;
+    }
+    th:hover { color: #94a3b8; }
+    th .sort-icon { margin-left: 0.3em; opacity: 0.4; }
+    th.sorted .sort-icon { opacity: 1; color: #6366f1; }
+
+    td { padding: 0.6rem 0.75rem; border-bottom: 1px solid #1a1f2e; vertical-align: middle; }
     tr:last-child td { border-bottom: none; }
     tr:hover td { background: #252a3a; }
 
+    td.coverage-cell { min-width: 160px; }
+
+    /* ── Sparklines ── */
+    td.sparkline-cell { width: 110px; padding-top: 0.4rem; padding-bottom: 0.4rem; }
+    td.sparkline-cell canvas { display: block; }
+
+    /* ── Badges ── */
     .badge {
       display: inline-block;
       padding: 0.2rem 0.6rem;
@@ -87,15 +196,76 @@
     .badge-red    { background: #7f1d1d; color: #f87171; }
     .badge-grey   { background: #1e293b; color: #64748b; }
 
-    .source-tag {
-      font-size: 0.7rem;
-      color: #475569;
-      font-style: italic;
-    }
+    .source-tag { font-size: 0.7rem; color: #475569; font-style: italic; }
 
     .trend-up   { color: #4ade80; }
     .trend-down { color: #f87171; }
     .trend-flat { color: #64748b; }
+
+    /* ── Empty state ── */
+    .empty-note { color: #475569; font-size: 0.85rem; padding: 0.5rem 0; }
+
+    /* ── Filter row ── */
+    .filter-row {
+      display: flex;
+      gap: 0.5rem;
+      margin-bottom: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .filter-btn {
+      background: #151925;
+      border: 1px solid #2d3348;
+      border-radius: 6px;
+      color: #94a3b8;
+      font-size: 0.75rem;
+      padding: 0.3rem 0.75rem;
+      cursor: pointer;
+      transition: background 0.15s, border-color 0.15s;
+    }
+
+    .filter-btn:hover { background: #1e2130; border-color: #3b4268; }
+    .filter-btn.active { background: #1e2846; border-color: #6366f1; color: #818cf8; }
+
+    /* ── Donut legend ── */
+    .donut-legend {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      margin-top: 1rem;
+      font-size: 0.8rem;
+    }
+    .donut-legend-item {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .legend-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+    .legend-label { color: #94a3b8; flex: 1; }
+    .legend-count { color: #64748b; }
+
+    /* ── Copy button ── */
+    .copy-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4em;
+      background: #1e2130;
+      border: 1px solid #2d3348;
+      border-radius: 6px;
+      color: #94a3b8;
+      font-size: 0.8rem;
+      padding: 0.4rem 0.9rem;
+      cursor: pointer;
+      transition: background 0.15s, border-color 0.15s, color 0.15s;
+      white-space: nowrap;
+    }
+    .copy-btn:hover { background: #252a3a; border-color: #3b4268; color: #e2e8f0; }
+    .copy-btn.copied { background: #14532d; border-color: #4ade80; color: #4ade80; }
   </style>
 </head>
 <body>
@@ -105,32 +275,70 @@
     <h1>Backend Coverage Dashboard</h1>
     <div class="subtitle">LegalSifter microservices — unit test coverage</div>
   </div>
-  <div class="meta" id="meta">Loading…</div>
+  <div style="display:flex;align-items:center;gap:0.75rem;flex-wrap:wrap;">
+    <button class="copy-btn" id="copyBtn" onclick="copyCoverage()">
+      <svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="5" y="5" width="9" height="9" rx="1.5"/><path d="M11 5V3.5A1.5 1.5 0 0 0 9.5 2h-6A1.5 1.5 0 0 0 2 3.5v6A1.5 1.5 0 0 0 3.5 11H5"/>
+      </svg>
+      Copy Coverage Numbers
+    </button>
+    <div class="meta" id="meta">Loading…</div>
+  </div>
 </header>
 
-<div class="stats-row" id="stats-row"></div>
+<!-- KPI row -->
+<div class="kpi-row" id="kpi-row"></div>
 
-<div class="charts-grid">
+<!-- Primary charts: big bar + donut -->
+<div class="charts-primary">
   <div class="card">
-    <h2>Current Coverage by Service</h2>
-    <div class="chart-wrap"><canvas id="barChart"></canvas></div>
+    <h2>Coverage by Service <span style="color:#3b4268;font-weight:400;font-size:0.75rem;margin-left:0.5em">sorted · 80% target line</span></h2>
+    <div class="chart-wrap chart-wrap-bar"><canvas id="barChart"></canvas></div>
   </div>
-  <div class="card">
-    <h2>Coverage Trend Over Time</h2>
-    <div class="chart-wrap"><canvas id="lineChart"></canvas></div>
+  <div class="card" style="display:flex;flex-direction:column;">
+    <h2>Fleet Health Distribution</h2>
+    <div class="chart-wrap chart-wrap-donut"><canvas id="donutChart"></canvas></div>
+    <div class="donut-legend" id="donutLegend"></div>
   </div>
 </div>
 
+<!-- Needs Attention -->
+<div class="card" id="attention-card" style="margin-bottom:1.5rem;display:none;">
+  <h2>Needs Attention</h2>
+  <div class="attention-grid" id="attention-grid"></div>
+</div>
+
+<!-- Secondary charts: trend line + (future: sparklines) -->
+<div class="charts-secondary">
+  <div class="card">
+    <h2>Coverage Trend Over Time</h2>
+    <div class="chart-wrap chart-wrap-line"><canvas id="lineChart"></canvas></div>
+  </div>
+  <div class="card">
+    <h2>30-Day Change by Service</h2>
+    <div class="chart-wrap chart-wrap-line"><canvas id="deltaChart"></canvas></div>
+  </div>
+</div>
+
+<!-- Detail table -->
 <div class="card">
   <h2>Service Detail</h2>
+  <div class="filter-row" id="filter-row">
+    <button class="filter-btn active" data-filter="all">All</button>
+    <button class="filter-btn" data-filter="green">≥ 80%</button>
+    <button class="filter-btn" data-filter="warn">60–79%</button>
+    <button class="filter-btn" data-filter="red">&lt; 60%</button>
+    <button class="filter-btn" data-filter="na">No Data</button>
+  </div>
   <table id="detail-table">
     <thead>
       <tr>
-        <th>Service</th>
-        <th>Coverage</th>
-        <th>Last Updated</th>
-        <th>7-day trend</th>
-        <th>Source</th>
+        <th data-col="name">Service <span class="sort-icon">↕</span></th>
+        <th data-col="pct">Coverage <span class="sort-icon">↕</span></th>
+        <th style="cursor:default">History</th>
+        <th data-col="date">Last Updated <span class="sort-icon">↕</span></th>
+        <th data-col="delta">7-day Trend <span class="sort-icon">↕</span></th>
+        <th data-col="source">Source</th>
       </tr>
     </thead>
     <tbody></tbody>
@@ -139,6 +347,33 @@
 
 <script>
   const CSV_URL = "./coverage-history.csv";
+  const TARGET = 80;
+
+  function copyCoverage() {
+    const lines = tableData
+      .slice()
+      .sort((a, b) => a.name.localeCompare(b.name))
+      .map(r => `${r.name}: ${r.pct !== null ? r.pct.toFixed(1) + '%' : 'N/A'}`)
+      .join('\n');
+
+    navigator.clipboard.writeText(lines).then(() => {
+      const btn = document.getElementById('copyBtn');
+      btn.classList.add('copied');
+      btn.innerHTML = `
+        <svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="2 8 6 12 14 4"/>
+        </svg>
+        Copied!`;
+      setTimeout(() => {
+        btn.classList.remove('copied');
+        btn.innerHTML = `
+          <svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="5" y="5" width="9" height="9" rx="1.5"/><path d="M11 5V3.5A1.5 1.5 0 0 0 9.5 2h-6A1.5 1.5 0 0 0 2 3.5v6A1.5 1.5 0 0 0 3.5 11H5"/>
+          </svg>
+          Copy Coverage Numbers`;
+      }, 2000);
+    });
+  }
 
   const COLOR_PALETTE = [
     "#6366f1","#22d3ee","#f59e0b","#34d399","#f87171",
@@ -167,12 +402,137 @@
     return `<span class="trend-flat">→ ${delta > 0 ? '+' : ''}${delta.toFixed(1)}%</span>`;
   }
 
+  function progressBar(pct) {
+    if (pct === null) return '';
+    const color = barColor(pct);
+    const w = Math.min(100, pct);
+    return `<div class="progress-wrap"><div class="progress-bar" style="width:${w}%;background:${color}"></div></div>`;
+  }
+
+  // ── Table sort state ──
+  let sortCol = 'pct';
+  let sortDir = 1; // 1 = asc, -1 = desc
+  let filterState = 'all';
+  let tableData = [];
+  const sparkCharts = {};
+
+  function renderTable() {
+    // Destroy existing sparkline instances to avoid canvas reuse errors
+    for (const key of Object.keys(sparkCharts)) {
+      sparkCharts[key].destroy();
+      delete sparkCharts[key];
+    }
+
+    const tbody = document.querySelector("#detail-table tbody");
+    tbody.innerHTML = '';
+
+    let rows = [...tableData];
+
+    // Filter
+    if (filterState !== 'all') {
+      rows = rows.filter(r => {
+        const p = r.pct;
+        if (filterState === 'green')  return p !== null && p >= 80;
+        if (filterState === 'warn')   return p !== null && p >= 60 && p < 80;
+        if (filterState === 'red')    return p !== null && p < 60;
+        if (filterState === 'na')     return p === null;
+        return true;
+      });
+    }
+
+    // Sort
+    rows.sort((a, b) => {
+      let av = a[sortCol], bv = b[sortCol];
+      if (av === null && bv === null) return 0;
+      if (av === null) return 1;  // nulls always last
+      if (bv === null) return -1;
+      if (typeof av === 'string') return av.localeCompare(bv) * sortDir;
+      return (av - bv) * sortDir;
+    });
+
+    for (const r of rows) {
+      const tr = document.createElement("tr");
+      tr.dataset.filter = r.pct === null ? 'na' : r.pct >= 80 ? 'green' : r.pct >= 60 ? 'warn' : 'red';
+      const hasHistory = r.history && r.history.filter(h => h.pct !== null).length >= 1;
+      tr.innerHTML = `
+        <td><strong style="color:#e2e8f0">${r.name}</strong></td>
+        <td class="coverage-cell">${badge(r.pct)}${progressBar(r.pct)}</td>
+        <td class="sparkline-cell">${hasHistory ? `<canvas id="spark-${r.name}" width="100" height="36"></canvas>` : '<span style="color:#334155;font-size:0.75rem">—</span>'}</td>
+        <td style="color:#64748b;font-size:0.8rem">${r.date}</td>
+        <td>${trendArrow(r.delta)}</td>
+        <td><span class="source-tag">${r.source}</span></td>
+      `;
+      tbody.appendChild(tr);
+    }
+
+    // Render sparklines after rows are in the DOM
+    for (const r of rows) {
+      if (!r.history) continue;
+      const validHistory = r.history.filter(h => h.pct !== null);
+      if (validHistory.length < 1) continue;
+      const canvas = document.getElementById(`spark-${r.name}`);
+      if (!canvas) continue;
+
+      const color = barColor(r.pct);
+      const yValues = r.history.map(h => h.pct);
+      const allNull = yValues.every(v => v === null);
+      if (allNull) continue;
+
+      // Y-axis range: pad around the actual data range so the line isn't flat at edge
+      const defined = yValues.filter(v => v !== null);
+      const minY = Math.max(0, Math.min(...defined) - 5);
+      const maxY = Math.min(100, Math.max(...defined) + 5);
+
+      sparkCharts[r.name] = new Chart(canvas, {
+        type: 'line',
+        data: {
+          labels: r.history.map(h => h.date),
+          datasets: [{
+            data: yValues,
+            borderColor: color,
+            backgroundColor: color + '22',
+            borderWidth: 1.5,
+            pointRadius: 0,
+            spanGaps: true,
+            tension: 0.3,
+            fill: true,
+          }],
+        },
+        options: {
+          responsive: false,
+          animation: false,
+          plugins: {
+            legend: { display: false },
+            tooltip: { enabled: false },
+          },
+          scales: {
+            x: { display: false },
+            y: { display: false, min: minY, max: maxY },
+          },
+        },
+      });
+    }
+
+    // Update sort icons
+    document.querySelectorAll("#detail-table th").forEach(th => {
+      th.classList.remove("sorted");
+      const icon = th.querySelector(".sort-icon");
+      if (icon) icon.textContent = "↕";
+    });
+    const activeTh = document.querySelector(`#detail-table th[data-col="${sortCol}"]`);
+    if (activeTh) {
+      activeTh.classList.add("sorted");
+      const icon = activeTh.querySelector(".sort-icon");
+      if (icon) icon.textContent = sortDir === 1 ? "↑" : "↓";
+    }
+  }
+
   async function load() {
     const resp = await fetch(CSV_URL);
     const text = await resp.text();
     const { data } = Papa.parse(text, { header: true, skipEmptyLines: true });
 
-    // Group rows by repo, sort by date within each
+    // Group by repo
     const byRepo = {};
     for (const row of data) {
       if (!byRepo[row.repo]) byRepo[row.repo] = [];
@@ -186,63 +546,112 @@
       byRepo[r].sort((a, b) => a.date.localeCompare(b.date));
     }
 
-    // All unique dates
     const allDates = [...new Set(data.map(r => r.date))].sort();
     const repos = Object.keys(byRepo).sort();
+    const lastDate = allDates[allDates.length - 1];
 
-    // Latest values
     const latest = {};
     for (const repo of repos) {
       const rows = byRepo[repo];
       latest[repo] = rows[rows.length - 1];
     }
 
-    // Last updated
-    const lastDate = allDates[allDates.length - 1];
     document.getElementById("meta").textContent =
       `Last updated ${lastDate} · ${repos.length} services tracked`;
 
-    // Stat cards
+    // ── Compute stats ──
     const validPcts = repos.map(r => latest[r]?.pct).filter(p => p !== null);
     const avg = validPcts.length ? validPcts.reduce((a, b) => a + b, 0) / validPcts.length : null;
-    const above80 = validPcts.filter(p => p >= 80).length;
-    const below60 = validPcts.filter(p => p < 60).length;
+    const atTarget = validPcts.filter(p => p >= TARGET).length;
+    const below60  = validPcts.filter(p => p < 60).length;
+    const notReporting = repos.filter(r => latest[r]?.pct === null).length;
+    const highest = validPcts.length ? Math.max(...validPcts) : null;
+    const highestRepo = highest !== null
+      ? repos.find(r => latest[r]?.pct === highest)?.split("/")[1]
+      : null;
 
-    document.getElementById("stats-row").innerHTML = `
+    // ── KPI row ──
+    const targetColor = atTarget === repos.length ? '#4ade80'
+                      : atTarget >= repos.length * 0.7 ? '#fbbf24' : '#f87171';
+
+    document.getElementById("kpi-row").innerHTML = `
+      <div class="stat-card hero">
+        <div class="stat-label">Services Meeting Target (≥${TARGET}%)</div>
+        <div class="stat-value" style="color:${targetColor}">${atTarget} <span style="font-size:1.25rem;color:#475569">/ ${repos.length}</span></div>
+        <div class="stat-sub">${validPcts.length} reporting · ${notReporting} no data</div>
+      </div>
       <div class="stat-card">
-        <div class="stat-label">Average Coverage</div>
+        <div class="stat-label">Fleet Avg Coverage</div>
         <div class="stat-value" style="color:${avg >= 80 ? '#4ade80' : avg >= 60 ? '#fbbf24' : '#f87171'}">${avg !== null ? avg.toFixed(1) + '%' : 'N/A'}</div>
+        <div class="stat-sub">across ${validPcts.length} reporting</div>
       </div>
       <div class="stat-card">
-        <div class="stat-label">Services Tracked</div>
-        <div class="stat-value" style="color:#6366f1">${repos.length}</div>
+        <div class="stat-label">Highest Coverage</div>
+        <div class="stat-value" style="color:#4ade80">${highest !== null ? highest.toFixed(1) + '%' : 'N/A'}</div>
+        <div class="stat-sub">${highestRepo || '—'}</div>
       </div>
       <div class="stat-card">
-        <div class="stat-label">Above 80%</div>
-        <div class="stat-value" style="color:#4ade80">${above80}</div>
+        <div class="stat-label">Below Target</div>
+        <div class="stat-value" style="color:${(validPcts.length - atTarget) > 0 ? '#f87171' : '#4ade80'}">${validPcts.length - atTarget}</div>
+        <div class="stat-sub">${below60} below 60%</div>
       </div>
       <div class="stat-card">
-        <div class="stat-label">Below 60%</div>
-        <div class="stat-value" style="color:#f87171">${below60}</div>
+        <div class="stat-label">Not Reporting</div>
+        <div class="stat-value" style="color:${notReporting > 0 ? '#fbbf24' : '#4ade80'}">${notReporting}</div>
+        <div class="stat-sub">no coverage data</div>
       </div>
     `;
 
-    // Bar chart
-    const barData = repos.map(r => latest[r]?.pct ?? 0);
+    // ── Bar chart (sorted descending) ──
+    const sortedRepos = [...repos].sort((a, b) => {
+      const pa = latest[a]?.pct ?? -1;
+      const pb = latest[b]?.pct ?? -1;
+      return pb - pa;
+    });
+
+    const barData = sortedRepos.map(r => latest[r]?.pct ?? 0);
     new Chart(document.getElementById("barChart"), {
       type: "bar",
       data: {
-        labels: repos.map(r => r.split("/")[1]),
+        labels: sortedRepos.map(r => r.split("/")[1]),
         datasets: [{
+          label: "Coverage %",
           data: barData,
-          backgroundColor: barData.map(barColor),
+          backgroundColor: barData.map(v => latest[sortedRepos[barData.indexOf(v)]]?.pct === null ? "#334155" : barColor(v)),
           borderRadius: 4,
         }],
       },
       options: {
         responsive: true,
         maintainAspectRatio: false,
-        plugins: { legend: { display: false } },
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            callbacks: {
+              label: ctx => ` ${ctx.raw.toFixed(1)}%`,
+            },
+          },
+          annotation: {
+            annotations: {
+              targetLine: {
+                type: 'line',
+                yMin: TARGET, yMax: TARGET,
+                borderColor: '#6366f1',
+                borderWidth: 2,
+                borderDash: [6, 3],
+                label: {
+                  content: `${TARGET}% target`,
+                  display: true,
+                  color: '#818cf8',
+                  font: { size: 11 },
+                  position: 'start',
+                  backgroundColor: 'transparent',
+                  padding: 0,
+                },
+              },
+            },
+          },
+        },
         scales: {
           x: { ticks: { color: "#94a3b8", font: { size: 10 } }, grid: { color: "#1e293b" } },
           y: {
@@ -252,11 +661,119 @@
           },
         },
       },
+      plugins: [{
+        // Inline plugin: draw the 80% target line without needing chartjs-plugin-annotation
+        id: 'targetLine',
+        afterDraw(chart) {
+          const { ctx, chartArea: { left, right }, scales: { y } } = chart;
+          const yPos = y.getPixelForValue(TARGET);
+          ctx.save();
+          ctx.beginPath();
+          ctx.setLineDash([6, 4]);
+          ctx.moveTo(left, yPos);
+          ctx.lineTo(right, yPos);
+          ctx.strokeStyle = '#6366f1';
+          ctx.lineWidth = 2;
+          ctx.stroke();
+          ctx.setLineDash([]);
+          ctx.font = '11px sans-serif';
+          ctx.fillStyle = '#818cf8';
+          ctx.fillText(`${TARGET}% target`, left + 4, yPos - 5);
+          ctx.restore();
+        },
+      }],
     });
 
-    // Line chart — one dataset per repo, only repos with >1 data point
+    // ── Donut chart ──
+    const countGreen  = validPcts.filter(p => p >= 80).length;
+    const countYellow = validPcts.filter(p => p >= 60 && p < 80).length;
+    const countRed    = validPcts.filter(p => p < 60).length;
+    const countNA     = notReporting;
+
+    const donutLabels = ['≥ 80% (on target)', '60–79% (warning)', '< 60% (critical)', 'No data'];
+    const donutColors = ['#4ade80', '#fbbf24', '#f87171', '#334155'];
+    const donutCounts = [countGreen, countYellow, countRed, countNA];
+
+    new Chart(document.getElementById("donutChart"), {
+      type: "doughnut",
+      data: {
+        labels: donutLabels,
+        datasets: [{
+          data: donutCounts,
+          backgroundColor: donutColors,
+          borderColor: '#0f1117',
+          borderWidth: 3,
+        }],
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        cutout: '65%',
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            callbacks: {
+              label: ctx => ` ${ctx.label}: ${ctx.raw} service${ctx.raw !== 1 ? 's' : ''}`,
+            },
+          },
+        },
+      },
+    });
+
+    // Donut legend (manual, easier to read)
+    const legendEl = document.getElementById("donutLegend");
+    donutLabels.forEach((label, i) => {
+      if (donutCounts[i] === 0) return;
+      legendEl.innerHTML += `
+        <div class="donut-legend-item">
+          <div class="legend-dot" style="background:${donutColors[i]}"></div>
+          <span class="legend-label">${label}</span>
+          <span class="legend-count">${donutCounts[i]}</span>
+        </div>`;
+    });
+
+    // ── Needs Attention panel ──
+    const attention = [];
+    for (const repo of repos) {
+      const cur = latest[repo];
+      if (cur.pct !== null && cur.pct < TARGET) {
+        attention.push({ repo, cur, type: 'below' });
+      } else if (cur.pct === null) {
+        attention.push({ repo, cur, type: 'no-data' });
+      }
+    }
+
+    if (attention.length > 0) {
+      const card = document.getElementById("attention-card");
+      const grid = document.getElementById("attention-grid");
+      card.style.display = '';
+
+      for (const { repo, cur, type } of attention) {
+        const name = repo.split("/")[1];
+        const div = document.createElement("div");
+        div.className = `attention-item ${type === 'below' ? 'below' : 'no-data'}`;
+        if (type === 'below') {
+          div.innerHTML = `
+            <div class="attention-name">${name}</div>
+            <div class="attention-value" style="color:${barColor(cur.pct)}">${cur.pct.toFixed(1)}%</div>
+            <div class="progress-wrap"><div class="progress-bar" style="width:${cur.pct}%;background:${barColor(cur.pct)}"></div></div>
+            <div class="attention-sub">${(TARGET - cur.pct).toFixed(1)}pp below target · ${cur.date}</div>
+          `;
+        } else {
+          div.innerHTML = `
+            <div class="attention-name">${name}</div>
+            <div class="attention-value" style="color:#475569">N/A</div>
+            <div class="attention-sub">No coverage data · ${cur.date}</div>
+          `;
+        }
+        grid.appendChild(div);
+      }
+    }
+
+    // ── Line chart (trend over time) ──
     const lineDatasets = repos.map((repo, i) => {
       const rows = byRepo[repo];
+      if (rows.length <= 1) return null;
       const pointsByDate = Object.fromEntries(rows.map(r => [r.date, r.pct]));
       return {
         label: repo.split("/")[1],
@@ -268,7 +785,7 @@
         spanGaps: true,
         tension: 0.3,
       };
-    }).filter((_, i) => byRepo[repos[i]].length > 1);
+    }).filter(Boolean);
 
     new Chart(document.getElementById("lineChart"), {
       type: "line",
@@ -290,34 +807,148 @@
           },
         },
       },
+      plugins: [{
+        id: 'targetLine',
+        afterDraw(chart) {
+          const { ctx, chartArea: { left, right }, scales: { y } } = chart;
+          const yPos = y.getPixelForValue(TARGET);
+          ctx.save();
+          ctx.beginPath();
+          ctx.setLineDash([6, 4]);
+          ctx.moveTo(left, yPos);
+          ctx.lineTo(right, yPos);
+          ctx.strokeStyle = '#3b4268';
+          ctx.lineWidth = 1;
+          ctx.stroke();
+          ctx.restore();
+        },
+      }],
     });
 
-    // Detail table
-    const tbody = document.querySelector("#detail-table tbody");
+    // ── 30-day delta chart ──
+    const thirtyDaysAgo = new Date(lastDate);
+    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+    const iso30 = thirtyDaysAgo.toISOString().slice(0, 10);
+
+    const deltaData = repos.map(repo => {
+      const rows = byRepo[repo];
+      const cur = rows[rows.length - 1];
+      if (cur.pct === null) return { name: repo.split("/")[1], delta: null };
+      const older = rows.filter(r => r.date <= iso30 && r.pct !== null);
+      const old = older.length ? older[older.length - 1] : null;
+      return {
+        name: repo.split("/")[1],
+        delta: old ? cur.pct - old.pct : null,
+      };
+    }).filter(d => d.delta !== null);
+
+    deltaData.sort((a, b) => a.delta - b.delta);
+
+    if (deltaData.length > 0) {
+      new Chart(document.getElementById("deltaChart"), {
+        type: "bar",
+        data: {
+          labels: deltaData.map(d => d.name),
+          datasets: [{
+            label: "30-day change (pp)",
+            data: deltaData.map(d => d.delta),
+            backgroundColor: deltaData.map(d => d.delta >= 0 ? '#4ade8066' : '#f8717166'),
+            borderColor: deltaData.map(d => d.delta >= 0 ? '#4ade80' : '#f87171'),
+            borderWidth: 1,
+            borderRadius: 3,
+          }],
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { display: false },
+            tooltip: {
+              callbacks: {
+                label: ctx => ` ${ctx.raw >= 0 ? '+' : ''}${ctx.raw.toFixed(1)}pp`,
+              },
+            },
+          },
+          scales: {
+            x: { ticks: { color: "#94a3b8", font: { size: 10 } }, grid: { color: "#1e293b" } },
+            y: {
+              ticks: { color: "#94a3b8", callback: v => (v >= 0 ? '+' : '') + v + 'pp' },
+              grid: { color: "#2d3348" },
+            },
+          },
+        },
+        plugins: [{
+          id: 'zeroLine',
+          afterDraw(chart) {
+            const { ctx, chartArea: { left, right }, scales: { y } } = chart;
+            const yPos = y.getPixelForValue(0);
+            ctx.save();
+            ctx.beginPath();
+            ctx.moveTo(left, yPos);
+            ctx.lineTo(right, yPos);
+            ctx.strokeStyle = '#475569';
+            ctx.lineWidth = 1;
+            ctx.stroke();
+            ctx.restore();
+          },
+        }],
+      });
+    } else {
+      document.getElementById("deltaChart").closest(".card").innerHTML =
+        '<h2>30-Day Change by Service</h2><p class="empty-note">Not enough history to compute 30-day delta.</p>';
+    }
+
+    // ── Build table data ──
     for (const repo of repos) {
       const rows = byRepo[repo];
       const cur = rows[rows.length - 1];
 
-      // 7-day trend: find a row ~7 days ago
       const sevenDaysAgo = new Date(lastDate);
       sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
       const isoWeekAgo = sevenDaysAgo.toISOString().slice(0, 10);
-      const older = rows.filter(r => r.date <= isoWeekAgo);
+      const older = rows.filter(r => r.date <= isoWeekAgo && r.pct !== null);
       const weekRow = older.length ? older[older.length - 1] : null;
       const delta = (cur.pct !== null && weekRow?.pct !== null && weekRow?.pct !== undefined)
-        ? cur.pct - weekRow.pct
-        : null;
+        ? cur.pct - weekRow.pct : null;
 
-      const tr = document.createElement("tr");
-      tr.innerHTML = `
-        <td>${repo.split("/")[1]}</td>
-        <td>${badge(cur.pct)}</td>
-        <td>${cur.date}</td>
-        <td>${trendArrow(delta)}</td>
-        <td><span class="source-tag">${cur.source}</span></td>
-      `;
-      tbody.appendChild(tr);
+      tableData.push({
+        name: repo.split("/")[1],
+        pct: cur.pct,
+        date: cur.date,
+        delta,
+        source: cur.source,
+        history: byRepo[repo].map(r => ({ date: r.date, pct: r.pct })),
+      });
     }
+
+    // Default sort: coverage ascending (worst first)
+    sortCol = 'pct';
+    sortDir = 1;
+    renderTable();
+
+    // ── Table sort click ──
+    document.querySelectorAll("#detail-table th[data-col]").forEach(th => {
+      th.addEventListener("click", () => {
+        const col = th.dataset.col;
+        if (sortCol === col) {
+          sortDir *= -1;
+        } else {
+          sortCol = col;
+          sortDir = col === 'pct' ? 1 : -1;
+        }
+        renderTable();
+      });
+    });
+
+    // ── Filter buttons ──
+    document.querySelectorAll(".filter-btn").forEach(btn => {
+      btn.addEventListener("click", () => {
+        document.querySelectorAll(".filter-btn").forEach(b => b.classList.remove("active"));
+        btn.classList.add("active");
+        filterState = btn.dataset.filter;
+        renderTable();
+      });
+    });
   }
 
   load().catch(err => {
