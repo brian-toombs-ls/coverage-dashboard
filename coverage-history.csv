@@ -156,10 +156,10 @@ date,repo,coverage_pct,source
 2026-08-19,LegalSifter/api-settings,,unavailable
 2026-08-19,LegalSifter/api-tickets,,unavailable
 2026-08-19,LegalSifter/automator,,unavailable
-2026-08-19,LegalSifter/control-bff,,unavailable
+2026-08-19,LegalSifter/control-bff,92.32,fresh
 2026-08-19,LegalSifter/go-mail,,unavailable
 2026-08-19,LegalSifter/go-microservices,,unavailable
-2026-08-19,LegalSifter/ls-review-fe,0.00,fresh
+2026-08-19,LegalSifter/ls-review-fe,82.82,fresh
 2026-08-19,LegalSifter/ms-auth,,unavailable
 2026-08-19,LegalSifter/ms-billing,82.90,carried_forward
 2026-08-19,LegalSifter/ms-chat,,unavailable
