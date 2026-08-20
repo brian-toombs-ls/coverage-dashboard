@@ -100,7 +100,9 @@
       border: 1px solid var(--border);
       border-radius: 6px;
       padding: 1.25rem 1.5rem;
+      transition: border-color 0.1s;
     }
+    .stat-card:hover { border-color: var(--border2); }
 
     .stat-label {
       font-size: 0.7rem;
@@ -150,15 +152,6 @@
     }
 
 
-    /* ── Progress bar (pod) ── */
-    .progress-wrap {
-      background: var(--surface2);
-      border-radius: 2px;
-      height: 4px;
-      overflow: hidden;
-      margin-top: 4px;
-    }
-    .progress-bar { height: 100%; border-radius: 2px; }
 
     /* ── Service pod grid ── */
     .group-label {
@@ -201,7 +194,10 @@
       flex-direction: column;
       gap: 0.45rem;
       border-top: 2px solid transparent;
+      transition: background 0.1s;
+      cursor: default;
     }
+    .service-pod:hover { background: #1d2025; }
     .service-pod.s-green  { border-top-color: var(--green); }
     .service-pod.s-yellow { border-top-color: var(--yellow); }
     .service-pod.s-red    { border-top-color: var(--red); }
@@ -228,6 +224,7 @@
       flex-shrink: 0;
       min-width: 3.5rem;
     }
+    /* sparkline — time-based trend */
     .pod-spark {
       flex: 1;
       position: relative;
@@ -243,15 +240,39 @@
       font-size: 0.7rem;
     }
 
-    .pod-bar {
-      height: 3px;
+    /* coverage meter — 0–100 quantity bar with target marker */
+    .pod-meter {
+      position: relative;
+      height: 6px;
       background: var(--surface2);
-      border-radius: 2px;
-      overflow: hidden;
+      border-radius: 1px;
+      overflow: visible;
     }
-    .pod-bar-fill {
+    .pod-meter-fill {
       height: 100%;
-      border-radius: 2px;
+      border-radius: 1px;
+      max-width: 100%;
+    }
+    /* target tick at 80% */
+    .pod-meter-target {
+      position: absolute;
+      top: -3px;
+      bottom: -3px;
+      left: 80%;
+      width: 1px;
+      background: var(--muted2);
+      transform: translateX(-50%);
+    }
+    /* show target label on pod hover */
+    .service-pod:hover .pod-meter-target::after {
+      content: '80%';
+      position: absolute;
+      top: -16px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 0.58rem;
+      color: var(--muted2);
+      white-space: nowrap;
     }
 
     .pod-meta {
@@ -328,7 +349,10 @@
       background: var(--surface);
       padding: 0.55rem 0.75rem;
       gap: 0.75rem;
+      transition: background 0.1s;
+      cursor: default;
     }
+    .insight-row:hover { background: #1d2025; }
     .insight-name { font-size: 0.8rem; font-weight: 500; color: var(--text); }
     .insight-detail { font-size: 0.72rem; color: var(--muted); }
     .insight-pct { font-size: 0.85rem; font-weight: 700; }
@@ -492,7 +516,10 @@
               ? `<div class="pod-spark"><canvas id="spark-${r.name}"></canvas></div>`
               : `<div class="pod-spark-empty">no history yet</div>`}
           </div>
-          <div class="pod-bar"><div class="pod-bar-fill" style="width:${Math.min(100, r.pct ?? 0)}%;background:${color}"></div></div>
+          <div class="pod-meter">
+            <div class="pod-meter-fill" style="width:${Math.min(100, r.pct ?? 0)}%;background:${color}"></div>
+            <div class="pod-meter-target"></div>
+          </div>
           <div class="pod-meta">
             ${trendLabel(r.delta)}
             <span class="pod-meta-sep">·</span>
@@ -533,11 +560,30 @@
           labels: r.history.map(h => h.date),
           datasets: [{ data: yValues, borderColor: color,
             backgroundColor: color + '20', borderWidth: 1.5,
-            pointRadius: 0, spanGaps: true, tension: 0.3, fill: true }],
+            pointRadius: 0, pointHoverRadius: 4, pointHoverBackgroundColor: color,
+            spanGaps: true, tension: 0.3, fill: true }],
         },
         options: {
           responsive: true, maintainAspectRatio: false, animation: false,
-          plugins: { legend: { display: false }, tooltip: { enabled: false } },
+          interaction: { mode: 'index', intersect: false },
+          plugins: {
+            legend: { display: false },
+            tooltip: {
+              enabled: true,
+              backgroundColor: '#1e2125',
+              borderColor: '#2c3036',
+              borderWidth: 1,
+              titleColor: '#8d9099',
+              bodyColor: '#d9dde3',
+              titleFont: { size: 10 },
+              bodyFont: { size: 11, weight: 'bold' },
+              padding: 6,
+              callbacks: {
+                title: items => items[0].label,
+                label: ctx => ctx.raw !== null ? ` ${ctx.raw.toFixed(1)}%` : ' N/A',
+              },
+            },
+          },
           scales: { x: { display: false }, y: { display: false, min: minY, max: maxY } },
         },
       });
