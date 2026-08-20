@@ -10,28 +10,25 @@
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
-      --bg:         #0b0d14;
-      --surface:    #111420;
-      --surface2:   #161929;
-      --border:     #1e2236;
-      --border2:    #252a40;
-      --text:       #e2e8f0;
-      --muted:      #64748b;
-      --muted2:     #3d4663;
-      --indigo:     #6366f1;
-      --indigo-lt:  #818cf8;
-      --indigo-dim: #2a2d5e;
-      --green:      #4ade80;
-      --green-dim:  #14532d;
-      --yellow:     #fbbf24;
-      --yellow-dim: #713f12;
-      --red:        #f87171;
-      --red-dim:    #7f1d1d;
-      --cyan:       #22d3ee;
+      --bg:       #111217;
+      --surface:  #181b1f;
+      --surface2: #1e2125;
+      --border:   #2c3036;
+      --border2:  #3a3f47;
+      --text:     #d9dde3;
+      --muted:    #8d9099;
+      --muted2:   #4d535c;
+      --accent:   #5794f2;
+      --green:    #6ccf8e;
+      --green-bg: #1a2e22;
+      --yellow:   #f5a623;
+      --yellow-bg:#2e2516;
+      --red:      #f2495c;
+      --red-bg:   #2e1520;
     }
 
     body {
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      font-family: -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", Roboto, sans-serif;
       background: var(--bg);
       color: var(--text);
       min-height: 100vh;
@@ -43,112 +40,85 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 2.5rem;
+      margin-bottom: 2rem;
       flex-wrap: wrap;
       gap: 1rem;
+      padding-bottom: 1.25rem;
+      border-bottom: 1px solid var(--border);
     }
 
     .logo-area h1 {
-      font-size: 1.25rem;
-      font-weight: 700;
-      color: #f8fafc;
-      letter-spacing: -0.02em;
+      font-size: 1.05rem;
+      font-weight: 600;
+      color: var(--text);
+      letter-spacing: -0.01em;
     }
     .logo-area .subtitle {
-      font-size: 0.8rem;
+      font-size: 0.78rem;
       color: var(--muted);
-      margin-top: 0.2rem;
+      margin-top: 0.15rem;
     }
 
     .header-right {
       display: flex;
       align-items: center;
-      gap: 1rem;
+      gap: 0.75rem;
       flex-wrap: wrap;
     }
 
-    .meta { font-size: 0.78rem; color: var(--muted2); }
+    .meta { font-size: 0.75rem; color: var(--muted); }
 
-    /* ── Copy button — prominent ── */
+    /* ── Copy button ── */
     .copy-btn {
       display: inline-flex;
       align-items: center;
-      gap: 0.45em;
-      background: var(--indigo);
-      border: 1px solid var(--indigo-lt);
-      border-radius: 7px;
+      gap: 0.4em;
+      background: var(--accent);
+      border: none;
+      border-radius: 4px;
       color: #fff;
-      font-size: 0.82rem;
-      font-weight: 600;
-      padding: 0.5rem 1.1rem;
+      font-size: 0.8rem;
+      font-weight: 500;
+      padding: 0.45rem 1rem;
       cursor: pointer;
-      transition: background 0.15s, box-shadow 0.15s, transform 0.1s;
-      box-shadow: 0 0 16px rgba(99,102,241,0.35);
-      letter-spacing: 0.01em;
+      transition: background 0.15s;
     }
-    .copy-btn:hover {
-      background: var(--indigo-lt);
-      box-shadow: 0 0 24px rgba(99,102,241,0.5);
-      transform: translateY(-1px);
-    }
-    .copy-btn:active { transform: translateY(0); }
-    .copy-btn.copied {
-      background: var(--green-dim);
-      border-color: var(--green);
-      box-shadow: 0 0 16px rgba(74,222,128,0.3);
-    }
+    .copy-btn:hover { background: #4a84e8; }
+    .copy-btn.copied { background: #3a7d5c; }
 
     /* ── KPI Row ── */
     .kpi-row {
       display: grid;
-      grid-template-columns: 2.2fr 1fr 1fr 1fr 1fr;
+      grid-template-columns: 2fr 1fr 1fr 1fr 1fr;
       gap: 1rem;
-      margin-bottom: 1.75rem;
+      margin-bottom: 1.5rem;
     }
     @media (max-width: 1000px) { .kpi-row { grid-template-columns: 1fr 1fr; } }
 
     .stat-card {
       background: var(--surface);
       border: 1px solid var(--border);
-      border-radius: 10px;
-      padding: 1.25rem 1.4rem;
-      position: relative;
-      overflow: hidden;
-      transition: border-color 0.2s, box-shadow 0.2s;
-    }
-    .stat-card:hover { border-color: var(--border2); box-shadow: 0 4px 24px rgba(0,0,0,0.3); }
-
-    .stat-card.hero {
-      background: linear-gradient(135deg, #0f1225 0%, #12163a 100%);
-      border-color: var(--indigo-dim);
-      box-shadow: 0 0 0 1px var(--indigo-dim), inset 0 1px 0 rgba(99,102,241,0.1);
-    }
-    .stat-card.hero::before {
-      content: '';
-      position: absolute;
-      top: -40px; right: -40px;
-      width: 120px; height: 120px;
-      background: radial-gradient(circle, rgba(99,102,241,0.15) 0%, transparent 70%);
-      pointer-events: none;
+      border-radius: 6px;
+      padding: 1.25rem 1.5rem;
     }
 
     .stat-label {
-      font-size: 0.72rem;
+      font-size: 0.7rem;
       color: var(--muted);
       text-transform: uppercase;
-      letter-spacing: 0.07em;
+      letter-spacing: 0.06em;
       font-weight: 500;
     }
     .stat-value {
-      font-size: 2.1rem;
-      font-weight: 800;
-      margin-top: 0.3rem;
+      font-size: 2rem;
+      font-weight: 700;
+      margin-top: 0.35rem;
       line-height: 1;
-      letter-spacing: -0.03em;
+      letter-spacing: -0.02em;
     }
-    .stat-card.hero .stat-value { font-size: 2.8rem; }
+    .stat-card.hero .stat-value { font-size: 2.6rem; }
     .stat-sub {
-      font-size: 0.72rem;
+      font-size: 0.7rem;
       color: var(--muted);
       margin-top: 0.4rem;
     }
@@ -157,18 +127,16 @@
     .card {
       background: var(--surface);
       border: 1px solid var(--border);
-      border-radius: 10px;
+      border-radius: 6px;
       padding: 1.25rem 1.4rem;
-      transition: border-color 0.2s;
     }
-    .card:hover { border-color: var(--border2); }
 
     .card-title {
       font-size: 0.72rem;
       font-weight: 600;
       color: var(--muted);
       text-transform: uppercase;
-      letter-spacing: 0.07em;
+      letter-spacing: 0.06em;
       margin-bottom: 1rem;
       display: flex;
       align-items: center;
@@ -178,21 +146,21 @@
       color: var(--muted2);
       font-weight: 400;
       font-size: 0.68rem;
-      letter-spacing: 0.04em;
+      letter-spacing: 0.03em;
     }
 
     /* ── Layout ── */
     .charts-primary {
       display: grid;
       grid-template-columns: 2fr 1fr;
-      gap: 1.25rem;
-      margin-bottom: 1.25rem;
+      gap: 1rem;
+      margin-bottom: 1rem;
     }
     .charts-secondary {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 1.25rem;
-      margin-bottom: 1.25rem;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
     }
     @media (max-width: 900px) {
       .charts-primary, .charts-secondary { grid-template-columns: 1fr; }
@@ -206,87 +174,77 @@
     /* ── Needs Attention ── */
     .attention-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-      gap: 0.75rem;
-      margin-top: 0.5rem;
+      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+      gap: 1px;
+      margin-top: 0.75rem;
+      background: var(--border);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      overflow: hidden;
     }
 
     .attention-item {
       background: var(--surface2);
-      border: 1px solid var(--border);
-      border-radius: 8px;
       padding: 0.85rem 1rem;
       display: flex;
       flex-direction: column;
-      gap: 0.35rem;
-      position: relative;
-      overflow: hidden;
-      transition: border-color 0.2s, box-shadow 0.2s;
+      gap: 0.3rem;
+      border-left: 3px solid transparent;
     }
-    .attention-item:hover { border-color: var(--border2); box-shadow: 0 2px 16px rgba(0,0,0,0.3); }
-    .attention-item.below {
-      border-left: 3px solid var(--red);
-      box-shadow: inset 3px 0 12px rgba(248,113,113,0.06);
-    }
-    .attention-item.no-data { border-left: 3px solid var(--muted2); }
+    .attention-item.below { border-left-color: var(--red); }
+    .attention-item.critical { border-left-color: var(--red); }
+    .attention-item.no-data { border-left-color: var(--muted2); }
 
-    @keyframes pulse-border {
-      0%, 100% { box-shadow: inset 3px 0 12px rgba(248,113,113,0.06); }
-      50%       { box-shadow: inset 3px 0 20px rgba(248,113,113,0.18); }
-    }
-    .attention-item.critical { animation: pulse-border 2.5s ease-in-out infinite; }
-
-    .attention-name { font-size: 0.82rem; font-weight: 600; color: var(--text); }
-    .attention-value { font-size: 1.3rem; font-weight: 800; letter-spacing: -0.02em; }
+    .attention-name { font-size: 0.8rem; font-weight: 500; color: var(--text); }
+    .attention-value { font-size: 1.25rem; font-weight: 700; letter-spacing: -0.02em; }
     .attention-sub { font-size: 0.68rem; color: var(--muted); }
 
     /* ── Progress bar ── */
     .progress-wrap {
-      background: rgba(255,255,255,0.05);
-      border-radius: 999px;
-      height: 5px;
+      background: var(--surface2);
+      border-radius: 2px;
+      height: 4px;
       overflow: hidden;
-      margin-top: 3px;
+      margin-top: 4px;
     }
     .progress-bar {
       height: 100%;
-      border-radius: 999px;
-      transition: width 0.6s cubic-bezier(0.4,0,0.2,1);
+      border-radius: 2px;
     }
 
     /* ── Table ── */
-    table { width: 100%; border-collapse: collapse; font-size: 0.855rem; }
+    table { width: 100%; border-collapse: collapse; font-size: 0.845rem; }
     th {
       text-align: left;
       padding: 0.5rem 0.75rem;
       color: var(--muted);
-      font-size: 0.7rem;
+      font-size: 0.68rem;
       text-transform: uppercase;
-      letter-spacing: 0.07em;
+      letter-spacing: 0.06em;
       border-bottom: 1px solid var(--border);
       cursor: pointer;
       user-select: none;
       white-space: nowrap;
       font-weight: 500;
     }
-    th:hover { color: #94a3b8; }
-    th .sort-icon { margin-left: 0.25em; opacity: 0.35; font-size: 0.65rem; }
-    th.sorted .sort-icon { opacity: 1; color: var(--indigo-lt); }
+    th:hover { color: var(--text); }
+    th .sort-icon { margin-left: 0.25em; opacity: 0.3; font-size: 0.65rem; }
+    th.sorted .sort-icon { opacity: 1; color: var(--accent); }
     th.no-sort { cursor: default; }
 
-    td { padding: 0.6rem 0.75rem; border-bottom: 1px solid rgba(30,34,54,0.8); vertical-align: middle; }
+    td { padding: 0.6rem 0.75rem; border-bottom: 1px solid var(--border); vertical-align: middle; }
     tr:last-child td { border-bottom: none; }
-    tr:hover td { background: rgba(255,255,255,0.02); }
+    tr:hover td { background: rgba(255,255,255,0.015); }
 
     /* Priority group headers */
     tr.group-header td {
-      background: var(--surface2);
+      background: var(--bg);
       color: var(--muted);
-      font-size: 0.68rem;
+      font-size: 0.66rem;
       font-weight: 600;
       text-transform: uppercase;
       letter-spacing: 0.08em;
-      padding: 0.4rem 0.75rem;
+      padding: 0.35rem 0.75rem;
       border-bottom: 1px solid var(--border);
     }
 
@@ -297,18 +255,17 @@
     /* ── Badges ── */
     .badge {
       display: inline-block;
-      padding: 0.18rem 0.55rem;
-      border-radius: 5px;
-      font-size: 0.78rem;
-      font-weight: 700;
-      letter-spacing: 0.01em;
+      padding: 0.15rem 0.5rem;
+      border-radius: 3px;
+      font-size: 0.75rem;
+      font-weight: 600;
     }
-    .badge-green  { background: var(--green-dim);  color: var(--green); }
-    .badge-yellow { background: var(--yellow-dim); color: var(--yellow); }
-    .badge-red    { background: var(--red-dim);    color: var(--red); }
-    .badge-grey   { background: #1a2035;           color: var(--muted); }
+    .badge-green  { background: var(--green-bg);  color: var(--green); }
+    .badge-yellow { background: var(--yellow-bg); color: var(--yellow); }
+    .badge-red    { background: var(--red-bg);    color: var(--red); }
+    .badge-grey   { background: var(--surface2);  color: var(--muted); }
 
-    .source-tag { font-size: 0.68rem; color: var(--muted2); font-style: italic; }
+    .source-tag { font-size: 0.68rem; color: var(--muted2); }
 
     .trend-up   { color: var(--green); font-size: 0.8rem; }
     .trend-down { color: var(--red);   font-size: 0.8rem; }
@@ -317,62 +274,57 @@
     /* stale indicator */
     .stale-dot {
       display: inline-block;
-      width: 6px; height: 6px;
+      width: 5px; height: 5px;
       border-radius: 50%;
       background: var(--yellow);
       margin-right: 4px;
       vertical-align: middle;
-      opacity: 0.8;
     }
 
     /* ── Filter row ── */
     .filter-row {
       display: flex;
-      gap: 0.5rem;
+      gap: 0.4rem;
       margin-bottom: 1rem;
       flex-wrap: wrap;
     }
     .filter-btn {
-      background: var(--surface2);
+      background: transparent;
       border: 1px solid var(--border);
-      border-radius: 6px;
+      border-radius: 3px;
       color: var(--muted);
-      font-size: 0.73rem;
+      font-size: 0.72rem;
       font-weight: 500;
-      padding: 0.3rem 0.8rem;
+      padding: 0.28rem 0.7rem;
       cursor: pointer;
-      transition: all 0.15s;
+      transition: border-color 0.12s, color 0.12s;
     }
     .filter-btn:hover { border-color: var(--border2); color: var(--text); }
-    .filter-btn.active { background: var(--indigo-dim); border-color: var(--indigo); color: var(--indigo-lt); }
+    .filter-btn.active { border-color: var(--accent); color: var(--accent); }
 
     /* ── Donut legend ── */
-    .donut-legend { display: flex; flex-direction: column; gap: 0.45rem; margin-top: 0.85rem; font-size: 0.78rem; }
+    .donut-legend { display: flex; flex-direction: column; gap: 0.4rem; margin-top: 0.75rem; font-size: 0.77rem; }
     .donut-legend-item { display: flex; align-items: center; gap: 0.5rem; }
-    .legend-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
-    .legend-label { color: #94a3b8; flex: 1; }
-    .legend-count { color: var(--muted); font-weight: 600; }
+    .legend-dot { width: 7px; height: 7px; border-radius: 1px; flex-shrink: 0; }
+    .legend-label { color: var(--muted); flex: 1; }
+    .legend-count { color: var(--text); font-weight: 600; }
 
     /* ── Empty state ── */
     .empty-note { color: var(--muted); font-size: 0.82rem; padding: 0.5rem 0; }
 
     /* ── Divider ── */
-    .section-gap { margin-bottom: 1.25rem; }
+    .section-gap { margin-bottom: 1.5rem; }
 
     /* ── Push date chip ── */
     .push-chip {
       display: inline-flex;
       align-items: center;
       gap: 0.3em;
-      font-size: 0.7rem;
+      font-size: 0.68rem;
       color: var(--muted);
-      background: var(--surface2);
-      border: 1px solid var(--border);
-      border-radius: 4px;
-      padding: 0.1rem 0.45rem;
       white-space: nowrap;
     }
-    .push-chip.stale { border-color: rgba(251,191,36,0.3); color: var(--yellow); }
+    .push-chip.stale { color: var(--yellow); }
   </style>
 </head>
 <body>
@@ -413,13 +365,13 @@
 </div>
 
 <!-- Needs Attention -->
-<div class="card section-gap" id="attention-card" style="display:none;">
+<div class="card" id="attention-card" style="display:none;margin-bottom:1rem;">
   <div class="card-title">Needs Attention</div>
   <div class="attention-grid" id="attention-grid"></div>
 </div>
 
 <!-- Secondary charts -->
-<div class="charts-secondary section-gap">
+<div class="charts-secondary">
   <div class="card">
     <div class="card-title">Coverage Trend <span class="card-title-note">zoomed to data range</span></div>
     <div class="chart-wrap chart-wrap-line"><canvas id="lineChart"></canvas></div>
@@ -462,9 +414,9 @@
   const STALE_DAYS = 60; // repo with no push in 60+ days is flagged stale
 
   const COLOR_PALETTE = [
-    "#6366f1","#22d3ee","#f59e0b","#34d399","#f87171",
-    "#a78bfa","#fb923c","#4ade80","#38bdf8","#e879f9",
-    "#facc15","#2dd4bf","#f472b6","#60a5fa","#a3e635",
+    "#5794f2","#73bf69","#f5a623","#b877d9","#f2495c",
+    "#37872d","#fade2a","#1f78c1","#e0752d","#6ed0e0",
+    "#ef843c","#9ac48a","#a352cc","#e5ac0e","#64b0c8",
   ];
 
   // ── Helpers ──────────────────────────────────────────────────────────────
@@ -477,10 +429,10 @@
   }
 
   function barColor(pct) {
-    if (pct === null) return "#1e2236";
-    if (pct >= 80) return "#4ade80";
-    if (pct >= 60) return "#fbbf24";
-    return "#f87171";
+    if (pct === null) return "#2c3036";
+    if (pct >= 80) return "#6ccf8e";
+    if (pct >= 60) return "#f5a623";
+    return "#f2495c";
   }
 
   function trendArrow(delta) {
@@ -510,19 +462,6 @@
     const label = days === 0 ? 'today' : days === 1 ? '1d ago' : `${days}d ago`;
     const stale = days >= STALE_DAYS;
     return `<span class="push-chip${stale ? ' stale' : ''}">${stale ? '<span class="stale-dot"></span>' : ''}${label}</span>`;
-  }
-
-  // animated counter
-  function animateCount(el, target, suffix = '', duration = 800) {
-    const start = performance.now();
-    const from = 0;
-    function step(now) {
-      const p = Math.min((now - start) / duration, 1);
-      const ease = 1 - Math.pow(1 - p, 3);
-      el.textContent = (from + (target - from) * ease).toFixed(suffix === '%' ? 1 : 0) + suffix;
-      if (p < 1) requestAnimationFrame(step);
-    }
-    requestAnimationFrame(step);
   }
 
   // ── Table state ──────────────────────────────────────────────────────────
@@ -675,7 +614,7 @@
   }
 
   // ── Target line plugin (reusable) ─────────────────────────────────────────
-  const targetLinePlugin = (color = '#6366f1', dash = [6,4], label = null) => ({
+  const targetLinePlugin = (color = '#5794f2', dash = [5,3], label = null) => ({
     id: 'targetLine',
     afterDraw(chart) {
       if (!chart.scales.y) return;
@@ -741,43 +680,38 @@
     const notReporting = repos.filter(r => latest[r]?.pct === null).length;
     const highest     = validPcts.length ? Math.max(...validPcts) : null;
     const highestRepo = highest !== null ? repos.find(r => latest[r]?.pct === highest)?.split("/")[1] : null;
-    const targetColor = atTarget === repos.length ? '#4ade80'
-                      : atTarget >= repos.length * 0.7 ? '#fbbf24' : '#f87171';
+    const targetColor = atTarget === repos.length ? '#6ccf8e'
+                      : atTarget >= repos.length * 0.7 ? '#f5a623' : '#f2495c';
 
     // ── KPI cards ──
+    const belowCount = validPcts.length - atTarget;
     document.getElementById("kpi-row").innerHTML = `
       <div class="stat-card hero">
         <div class="stat-label">Services Meeting Target ≥ ${TARGET}%</div>
-        <div class="stat-value" id="kpi-target" style="color:${targetColor}">0 <span style="font-size:1.4rem;color:var(--muted2)">/ ${repos.length}</span></div>
+        <div class="stat-value" style="color:${targetColor}">${atTarget} <span style="font-size:1.3rem;color:var(--muted2)">/ ${repos.length}</span></div>
         <div class="stat-sub">${validPcts.length} reporting · ${notReporting} no data</div>
       </div>
       <div class="stat-card">
         <div class="stat-label">Fleet Average</div>
-        <div class="stat-value" id="kpi-avg" style="color:${avg >= 80 ? '#4ade80' : avg >= 60 ? '#fbbf24' : '#f87171'}">0%</div>
+        <div class="stat-value" style="color:${avg >= 80 ? '#6ccf8e' : avg >= 60 ? '#f5a623' : '#f2495c'}">${avg !== null ? avg.toFixed(1) + '%' : '—'}</div>
         <div class="stat-sub">${validPcts.length} services reporting</div>
       </div>
       <div class="stat-card">
         <div class="stat-label">Highest Coverage</div>
-        <div class="stat-value" style="color:#4ade80">${highest !== null ? highest.toFixed(1) + '%' : '—'}</div>
+        <div class="stat-value" style="color:#6ccf8e">${highest !== null ? highest.toFixed(1) + '%' : '—'}</div>
         <div class="stat-sub">${highestRepo || '—'}</div>
       </div>
       <div class="stat-card">
         <div class="stat-label">Below Target</div>
-        <div class="stat-value" id="kpi-below" style="color:${(validPcts.length - atTarget) > 0 ? '#f87171' : '#4ade80'}">0</div>
+        <div class="stat-value" style="color:${belowCount > 0 ? '#f2495c' : '#6ccf8e'}">${belowCount}</div>
         <div class="stat-sub">${below60} critical (below 60%)</div>
       </div>
       <div class="stat-card">
         <div class="stat-label">Not Reporting</div>
-        <div class="stat-value" id="kpi-na" style="color:${notReporting > 0 ? '#fbbf24' : '#4ade80'}">0</div>
+        <div class="stat-value" style="color:${notReporting > 0 ? '#f5a623' : '#6ccf8e'}">${notReporting}</div>
         <div class="stat-sub">no coverage artifact</div>
       </div>
     `;
-
-    // Animated counters
-    animateCount(document.getElementById('kpi-target'), atTarget);
-    if (avg !== null) animateCount(document.getElementById('kpi-avg'), avg, '%');
-    animateCount(document.getElementById('kpi-below'), validPcts.length - atTarget);
-    animateCount(document.getElementById('kpi-na'), notReporting);
 
     // ── Bar chart (sorted, 0-100) ──
     const sortedRepos = [...repos].sort((a, b) => (latest[b]?.pct ?? -1) - (latest[a]?.pct ?? -1));
@@ -798,13 +732,13 @@
           tooltip: { callbacks: { label: ctx => ` ${ctx.raw.toFixed(1)}%` } },
         },
         scales: {
-          x: { ticks: { color: "#64748b", font: { size: 10 } }, grid: { color: "#1a1f2e" } },
+          x: { ticks: { color: "#8d9099", font: { size: 10 } }, grid: { color: "#22262b" } },
           y: { min: 0, max: 100,
-            ticks: { color: "#64748b", callback: v => v + "%" },
-            grid: { color: "#1a1f2e" } },
+            ticks: { color: "#8d9099", callback: v => v + "%" },
+            grid: { color: "#22262b" } },
         },
       },
-      plugins: [targetLinePlugin('#6366f1', [6,4], `${TARGET}% target`)],
+      plugins: [targetLinePlugin('#5794f2', [5,3], `${TARGET}% target`)],
     });
 
     // ── Donut chart ──
@@ -812,14 +746,14 @@
     const countYellow = validPcts.filter(p => p >= 60 && p < 80).length;
     const countRed    = validPcts.filter(p => p < 60).length;
     const donutLabels = ['≥ 80% on target', '60–79% warning', '< 60% critical', 'No data'];
-    const donutColors = ['#4ade80', '#fbbf24', '#f87171', '#1e2236'];
+    const donutColors = ['#6ccf8e', '#f5a623', '#f2495c', '#2c3036'];
     const donutCounts = [countGreen, countYellow, countRed, notReporting];
 
     new Chart(document.getElementById("donutChart"), {
       type: "doughnut",
       data: { labels: donutLabels,
         datasets: [{ data: donutCounts, backgroundColor: donutColors,
-          borderColor: '#0b0d14', borderWidth: 3 }] },
+          borderColor: '#111217', borderWidth: 3 }] },
       options: {
         responsive: true, maintainAspectRatio: false, cutout: '68%',
         plugins: {
@@ -896,16 +830,16 @@
       options: {
         responsive: true, maintainAspectRatio: false,
         plugins: {
-          legend: { labels: { color: "#64748b", font: { size: 10 }, boxWidth: 10 } },
+          legend: { labels: { color: "#8d9099", font: { size: 10 }, boxWidth: 8 } },
         },
         scales: {
-          x: { ticks: { color: "#64748b", font: { size: 10 }, maxTicksLimit: 10 }, grid: { color: "#1a1f2e" } },
+          x: { ticks: { color: "#8d9099", font: { size: 10 }, maxTicksLimit: 10 }, grid: { color: "#22262b" } },
           y: { min: lineMin, max: lineMax,
-            ticks: { color: "#64748b", callback: v => v + "%" },
-            grid: { color: "#1a1f2e" } },
+            ticks: { color: "#8d9099", callback: v => v + "%" },
+            grid: { color: "#22262b" } },
         },
       },
-      plugins: [targetLinePlugin('#3b4268', [5,3])],
+      plugins: [targetLinePlugin('#3a3f47', [5,3])],
     });
 
     // ── 30-day delta ──
@@ -931,8 +865,8 @@
           labels: deltaData.map(d => d.name),
           datasets: [{
             data: deltaData.map(d => d.delta),
-            backgroundColor: deltaData.map(d => d.delta >= 0 ? '#4ade8033' : '#f8717133'),
-            borderColor:     deltaData.map(d => d.delta >= 0 ? '#4ade80'   : '#f87171'),
+            backgroundColor: deltaData.map(d => d.delta >= 0 ? '#6ccf8e33' : '#f2495c33'),
+            borderColor:     deltaData.map(d => d.delta >= 0 ? '#6ccf8e'   : '#f2495c'),
             borderWidth: 1, borderRadius: 3,
           }],
         },
@@ -943,8 +877,8 @@
             tooltip: { callbacks: { label: ctx => ` ${ctx.raw >= 0 ? '+' : ''}${ctx.raw.toFixed(1)}pp` } },
           },
           scales: {
-            x: { ticks: { color: "#64748b", font: { size: 10 } }, grid: { color: "#1a1f2e" } },
-            y: { ticks: { color: "#64748b", callback: v => (v >= 0 ? '+' : '') + v + 'pp' }, grid: { color: "#1a1f2e" } },
+            x: { ticks: { color: "#8d9099", font: { size: 10 } }, grid: { color: "#22262b" } },
+            y: { ticks: { color: "#8d9099", callback: v => (v >= 0 ? '+' : '') + v + 'pp' }, grid: { color: "#22262b" } },
           },
         },
         plugins: [{
@@ -955,7 +889,7 @@
             ctx.save();
             ctx.beginPath();
             ctx.moveTo(left, yp); ctx.lineTo(right, yp);
-            ctx.strokeStyle = '#3d4663'; ctx.lineWidth = 1; ctx.stroke();
+            ctx.strokeStyle = '#3a3f47'; ctx.lineWidth = 1; ctx.stroke();
             ctx.restore();
           },
         }],
