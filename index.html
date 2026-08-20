@@ -225,6 +225,27 @@
       flex-shrink: 0;
       min-width: 3.5rem;
     }
+    .pod-delta {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 0.05rem;
+      flex-shrink: 0;
+      line-height: 1;
+    }
+    .pod-delta .pd-arrow {
+      font-size: 1rem;
+      line-height: 1;
+    }
+    .pod-delta .pd-val {
+      font-size: 0.62rem;
+      font-weight: 600;
+      letter-spacing: 0.01em;
+    }
+    .pod-delta.up   { color: var(--green); }
+    .pod-delta.down { color: var(--red); }
+    .pod-delta.flat { color: var(--muted2); }
     /* sparkline — time-based trend */
     .pod-spark {
       flex: 1;
@@ -287,10 +308,6 @@
     .pod-meta-sep { color: var(--muted2); }
 
     .source-tag { font-size: 0.68rem; color: var(--muted2); }
-
-    .trend-up   { color: var(--green); font-size: 0.78rem; }
-    .trend-down { color: var(--red);   font-size: 0.78rem; }
-    .trend-flat { color: var(--muted); font-size: 0.78rem; }
 
     /* ── Filter row ── */
     .filter-row {
@@ -423,13 +440,6 @@
     return "#f2495c";
   }
 
-  function trendLabel(delta) {
-    if (delta === null) return `<span class="trend-flat">—</span>`;
-    if (Math.abs(delta) < 0.1) return `<span class="trend-flat">stable</span>`;
-    if (delta > 0) return `<span class="trend-up">▲ +${delta.toFixed(1)}%</span>`;
-    return               `<span class="trend-down">▼ ${delta.toFixed(1)}%</span>`;
-  }
-
   function daysSince(dateStr) {
     if (!dateStr) return null;
     return Math.floor((Date.now() - new Date(dateStr).getTime()) / 86400000);
@@ -513,6 +523,12 @@
           <div class="pod-name">${r.name}</div>
           <div class="pod-main">
             <div class="pod-pct" style="color:${color}">${r.pct !== null ? r.pct.toFixed(1) + '%' : '—'}</div>
+            ${r.delta !== null
+              ? `<div class="pod-delta ${r.delta > 0.05 ? 'up' : r.delta < -0.05 ? 'down' : 'flat'}">
+                  <span class="pd-arrow">${r.delta > 0.05 ? '↑' : r.delta < -0.05 ? '↓' : '→'}</span>
+                  <span class="pd-val">${r.delta > 0 ? '+' : ''}${r.delta.toFixed(1)}%</span>
+                 </div>`
+              : ''}
             ${hasHistory
               ? `<div class="pod-spark"><canvas id="spark-${r.name}"></canvas></div>`
               : `<div class="pod-spark-empty">no history yet</div>`}
@@ -522,8 +538,6 @@
             <div class="pod-meter-target"></div>
           </div>
           <div class="pod-meta">
-            ${trendLabel(r.delta)}
-            <span class="pod-meta-sep">·</span>
             <span>${r.date}</span>
             <span class="pod-meta-sep">·</span>
             <span class="source-tag">${r.source}</span>
