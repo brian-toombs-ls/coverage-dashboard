@@ -196,23 +196,23 @@
 
     .service-pod {
       background: var(--surface);
-      padding: 0.9rem 1rem;
+      padding: 0.85rem 1rem;
       display: flex;
       flex-direction: column;
-      gap: 0.5rem;
+      gap: 0.45rem;
+      border-top: 2px solid transparent;
     }
+    .service-pod.s-green  { border-top-color: var(--green); }
+    .service-pod.s-yellow { border-top-color: var(--yellow); }
+    .service-pod.s-red    { border-top-color: var(--red); }
+    .service-pod.s-na     { border-top-color: var(--muted2); }
 
-    .pod-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-      gap: 0.5rem;
-    }
     .pod-name {
-      font-size: 0.8rem;
-      font-weight: 600;
+      font-size: 0.88rem;
+      font-weight: 700;
       color: var(--text);
       line-height: 1.2;
+      letter-spacing: -0.01em;
     }
 
     .pod-main {
@@ -264,34 +264,11 @@
     }
     .pod-meta-sep { color: var(--muted2); }
 
-    /* ── Badges ── */
-    .badge {
-      display: inline-block;
-      padding: 0.15rem 0.5rem;
-      border-radius: 3px;
-      font-size: 0.75rem;
-      font-weight: 600;
-    }
-    .badge-green  { background: var(--green-bg);  color: var(--green); }
-    .badge-yellow { background: var(--yellow-bg); color: var(--yellow); }
-    .badge-red    { background: var(--red-bg);    color: var(--red); }
-    .badge-grey   { background: var(--surface2);  color: var(--muted); }
-
     .source-tag { font-size: 0.68rem; color: var(--muted2); }
 
-    .trend-up   { color: var(--green); font-size: 0.8rem; }
-    .trend-down { color: var(--red);   font-size: 0.8rem; }
-    .trend-flat { color: var(--muted); font-size: 0.8rem; }
-
-    /* stale indicator */
-    .stale-dot {
-      display: inline-block;
-      width: 5px; height: 5px;
-      border-radius: 50%;
-      background: var(--yellow);
-      margin-right: 4px;
-      vertical-align: middle;
-    }
+    .trend-up   { color: var(--green); font-size: 0.78rem; }
+    .trend-down { color: var(--red);   font-size: 0.78rem; }
+    .trend-flat { color: var(--muted); font-size: 0.78rem; }
 
     /* ── Filter row ── */
     .filter-row {
@@ -328,13 +305,11 @@
     /* ── Secondary section ── */
     .secondary-row {
       display: grid;
-      grid-template-columns: 2fr 1fr;
+      grid-template-columns: 1fr 1fr;
       gap: 1rem;
       margin-bottom: 1.5rem;
     }
     @media (max-width: 900px) { .secondary-row { grid-template-columns: 1fr; } }
-
-    .chart-wrap-sm { position: relative; height: 180px; }
 
     /* ── At-risk / insights list ── */
     .insight-list {
@@ -381,15 +356,15 @@
 <!-- KPI row -->
 <div class="kpi-row" id="kpi-row"></div>
 
-<!-- Secondary: fleet trend + insights -->
-<div class="secondary-row" style="margin-bottom:1.5rem;">
+<!-- Secondary: two insight panels -->
+<div class="secondary-row">
   <div class="card">
-    <div class="card-title">Fleet Average <span class="card-title-note">coverage over time</span></div>
-    <div class="chart-wrap-sm"><canvas id="trendChart"></canvas></div>
+    <div class="card-title">At Risk <span class="card-title-note">pushed within 14d · below target</span></div>
+    <div id="at-risk-list"></div>
   </div>
   <div class="card">
-    <div class="card-title">At Risk <span class="card-title-note">active · below target</span></div>
-    <div id="at-risk-list"></div>
+    <div class="card-title">Coverage Changes <span class="card-title-note">since first recorded</span></div>
+    <div id="changes-list"></div>
   </div>
 </div>
 
@@ -421,13 +396,6 @@
     if (pct >= TARGET) return "#6ccf8e";
     if (pct >= 60)     return "#f5a623";
     return "#f2495c";
-  }
-
-  function badge(pct) {
-    if (pct === null) return `<span class="badge badge-grey">N/A</span>`;
-    if (pct >= TARGET) return `<span class="badge badge-green">${pct.toFixed(1)}%</span>`;
-    if (pct >= 60)     return `<span class="badge badge-yellow">${pct.toFixed(1)}%</span>`;
-    return                    `<span class="badge badge-red">${pct.toFixed(1)}%</span>`;
   }
 
   function trendLabel(delta) {
@@ -512,19 +480,17 @@
         const color = statusColor(r.pct);
         const hasHistory = r.history && r.history.filter(h => h.pct !== null).length >= 2;
         const push = pushLabel(r.pushed_at);
+        const statusClass = r.pct === null ? 's-na' : r.pct >= TARGET ? 's-green' : r.pct >= 60 ? 's-yellow' : 's-red';
 
         const pod = document.createElement('div');
-        pod.className = 'service-pod';
+        pod.className = `service-pod ${statusClass}`;
         pod.innerHTML = `
-          <div class="pod-header">
-            <span class="pod-name">${r.name}</span>
-            ${badge(r.pct)}
-          </div>
+          <div class="pod-name">${r.name}</div>
           <div class="pod-main">
             <div class="pod-pct" style="color:${color}">${r.pct !== null ? r.pct.toFixed(1) + '%' : '—'}</div>
             ${hasHistory
               ? `<div class="pod-spark"><canvas id="spark-${r.name}"></canvas></div>`
-              : `<div class="pod-spark-empty">no history</div>`}
+              : `<div class="pod-spark-empty">no history yet</div>`}
           </div>
           <div class="pod-bar"><div class="pod-bar-fill" style="width:${Math.min(100, r.pct ?? 0)}%;background:${color}"></div></div>
           <div class="pod-meta">
@@ -554,8 +520,10 @@
       const color = statusColor(r.pct);
       const yValues = r.history.map(h => h.pct);
       const vals    = yValues.filter(v => v !== null);
-      const spread  = Math.max(1, Math.max(...vals) - Math.min(...vals));
-      const pad     = Math.max(2, spread * 0.3);
+      const spread  = Math.max(...vals) - Math.min(...vals);
+      // Tight zoom: pad is 15% of spread but at least 0.5pp, making even tiny
+      // fluctuations visible. A stable repo shows a near-flat line near center.
+      const pad     = Math.max(0.5, spread * 0.15);
       const minY    = Math.max(0,   Math.min(...vals) - pad);
       const maxY    = Math.min(100, Math.max(...vals) + pad);
 
@@ -667,58 +635,40 @@
       </div>
     `;
 
-    // ── Fleet trend (average per day) ──
-    const dailyAvg = allDates.map(d => {
-      const vals = repos
-        .map(r => byRepo[r].filter(row => row.date <= d && row.pct !== null).at(-1)?.pct)
-        .filter(v => v !== null);
-      return vals.length ? vals.reduce((a, b) => a + b, 0) / vals.length : null;
-    });
+    // ── Coverage Changes (first recorded → latest) ──
+    const changesEl = document.getElementById('changes-list');
+    const changeItems = repos.map(repo => {
+      const rows = byRepo[repo].filter(r => r.pct !== null);
+      if (rows.length < 2) return null;
+      const first = rows[0];
+      const last  = rows[rows.length - 1];
+      return { name: repo.split('/')[1], delta: last.pct - first.pct, cur: last.pct };
+    }).filter(Boolean).filter(r => Math.abs(r.delta) >= 0.05);
 
-    const trendVals = dailyAvg.filter(v => v !== null);
-    const tMin = trendVals.length ? Math.max(0,   Math.floor(Math.min(...trendVals)) - 3) : 0;
-    const tMax = trendVals.length ? Math.min(100, Math.ceil( Math.max(...trendVals)) + 3) : 100;
+    changeItems.sort((a, b) => Math.abs(b.delta) - Math.abs(a.delta));
 
-    new Chart(document.getElementById('trendChart'), {
-      type: 'line',
-      data: {
-        labels: allDates,
-        datasets: [{
-          data: dailyAvg,
-          borderColor: '#5794f2',
-          backgroundColor: '#5794f210',
-          borderWidth: 2, pointRadius: allDates.length <= 14 ? 3 : 0,
-          pointBackgroundColor: '#5794f2',
-          spanGaps: true, tension: 0.3, fill: true,
-        }],
-      },
-      options: {
-        responsive: true, maintainAspectRatio: false,
-        plugins: {
-          legend: { display: false },
-          tooltip: { callbacks: { label: ctx => ` ${ctx.raw !== null ? ctx.raw.toFixed(1) + '%' : 'N/A'}` } },
-        },
-        scales: {
-          x: { ticks: { color: '#8d9099', font: { size: 10 }, maxTicksLimit: 8 }, grid: { color: '#22262b' } },
-          y: { min: tMin, max: tMax,
-               ticks: { color: '#8d9099', callback: v => v + '%' }, grid: { color: '#22262b' } },
-        },
-      },
-      plugins: [{
-        id: 'targetLine',
-        afterDraw(chart) {
-          if (!chart.scales.y) return;
-          const { ctx, chartArea: { left, right }, scales: { y } } = chart;
-          if (y.min > TARGET || y.max < TARGET) return;
-          const yp = y.getPixelForValue(TARGET);
-          ctx.save();
-          ctx.setLineDash([5, 3]);
-          ctx.beginPath(); ctx.moveTo(left, yp); ctx.lineTo(right, yp);
-          ctx.strokeStyle = '#3a3f47'; ctx.lineWidth = 1; ctx.stroke();
-          ctx.restore();
-        },
-      }],
-    });
+    if (changeItems.length === 0) {
+      changesEl.innerHTML = `<div class="insight-empty">Not enough history yet</div>`;
+    } else {
+      const list = document.createElement('div');
+      list.className = 'insight-list';
+      for (const item of changeItems.slice(0, 8)) {
+        const up = item.delta >= 0;
+        const row = document.createElement('div');
+        row.className = 'insight-row';
+        row.innerHTML = `
+          <div>
+            <div class="insight-name">${item.name}</div>
+            <div class="insight-detail">${item.cur.toFixed(1)}% current</div>
+          </div>
+          <div class="insight-pct" style="color:${up ? '#6ccf8e' : '#f2495c'}">
+            ${up ? '▲' : '▼'} ${up ? '+' : ''}${item.delta.toFixed(1)}%
+          </div>
+        `;
+        list.appendChild(row);
+      }
+      changesEl.appendChild(list);
+    }
 
     // ── At Risk: recently-active repos below target ──
     const atRiskList = document.getElementById('at-risk-list');
