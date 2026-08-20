@@ -3,207 +3,327 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>LegalSifter Backend Coverage</title>
+  <title>LegalSifter Coverage</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
+    :root {
+      --bg:         #0b0d14;
+      --surface:    #111420;
+      --surface2:   #161929;
+      --border:     #1e2236;
+      --border2:    #252a40;
+      --text:       #e2e8f0;
+      --muted:      #64748b;
+      --muted2:     #3d4663;
+      --indigo:     #6366f1;
+      --indigo-lt:  #818cf8;
+      --indigo-dim: #2a2d5e;
+      --green:      #4ade80;
+      --green-dim:  #14532d;
+      --yellow:     #fbbf24;
+      --yellow-dim: #713f12;
+      --red:        #f87171;
+      --red-dim:    #7f1d1d;
+      --cyan:       #22d3ee;
+    }
+
     body {
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-      background: #0f1117;
-      color: #e2e8f0;
+      background: var(--bg);
+      color: var(--text);
       min-height: 100vh;
       padding: 2rem;
     }
 
+    /* ── Header ── */
     header {
       display: flex;
       justify-content: space-between;
-      align-items: flex-end;
-      margin-bottom: 2rem;
+      align-items: center;
+      margin-bottom: 2.5rem;
       flex-wrap: wrap;
-      gap: 0.5rem;
+      gap: 1rem;
     }
 
-    h1 { font-size: 1.5rem; font-weight: 700; color: #f8fafc; }
-    .subtitle { font-size: 0.875rem; color: #64748b; margin-top: 0.25rem; }
-    .meta { font-size: 0.8rem; color: #475569; text-align: right; }
+    .logo-area h1 {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: #f8fafc;
+      letter-spacing: -0.02em;
+    }
+    .logo-area .subtitle {
+      font-size: 0.8rem;
+      color: var(--muted);
+      margin-top: 0.2rem;
+    }
+
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .meta { font-size: 0.78rem; color: var(--muted2); }
+
+    /* ── Copy button — prominent ── */
+    .copy-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45em;
+      background: var(--indigo);
+      border: 1px solid var(--indigo-lt);
+      border-radius: 7px;
+      color: #fff;
+      font-size: 0.82rem;
+      font-weight: 600;
+      padding: 0.5rem 1.1rem;
+      cursor: pointer;
+      transition: background 0.15s, box-shadow 0.15s, transform 0.1s;
+      box-shadow: 0 0 16px rgba(99,102,241,0.35);
+      letter-spacing: 0.01em;
+    }
+    .copy-btn:hover {
+      background: var(--indigo-lt);
+      box-shadow: 0 0 24px rgba(99,102,241,0.5);
+      transform: translateY(-1px);
+    }
+    .copy-btn:active { transform: translateY(0); }
+    .copy-btn.copied {
+      background: var(--green-dim);
+      border-color: var(--green);
+      box-shadow: 0 0 16px rgba(74,222,128,0.3);
+    }
 
     /* ── KPI Row ── */
     .kpi-row {
       display: grid;
-      grid-template-columns: 2fr 1fr 1fr 1fr 1fr;
+      grid-template-columns: 2.2fr 1fr 1fr 1fr 1fr;
       gap: 1rem;
-      margin-bottom: 2rem;
+      margin-bottom: 1.75rem;
     }
-    @media (max-width: 900px) { .kpi-row { grid-template-columns: 1fr 1fr; } }
+    @media (max-width: 1000px) { .kpi-row { grid-template-columns: 1fr 1fr; } }
 
     .stat-card {
-      background: #1e2130;
-      border: 1px solid #2d3348;
-      border-radius: 8px;
-      padding: 1.25rem;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 1.25rem 1.4rem;
+      position: relative;
+      overflow: hidden;
+      transition: border-color 0.2s, box-shadow 0.2s;
     }
+    .stat-card:hover { border-color: var(--border2); box-shadow: 0 4px 24px rgba(0,0,0,0.3); }
 
     .stat-card.hero {
-      background: #1a1f35;
-      border-color: #3b4268;
+      background: linear-gradient(135deg, #0f1225 0%, #12163a 100%);
+      border-color: var(--indigo-dim);
+      box-shadow: 0 0 0 1px var(--indigo-dim), inset 0 1px 0 rgba(99,102,241,0.1);
+    }
+    .stat-card.hero::before {
+      content: '';
+      position: absolute;
+      top: -40px; right: -40px;
+      width: 120px; height: 120px;
+      background: radial-gradient(circle, rgba(99,102,241,0.15) 0%, transparent 70%);
+      pointer-events: none;
     }
 
     .stat-label {
-      font-size: 0.75rem;
-      color: #64748b;
+      font-size: 0.72rem;
+      color: var(--muted);
       text-transform: uppercase;
-      letter-spacing: 0.05em;
+      letter-spacing: 0.07em;
+      font-weight: 500;
     }
-
     .stat-value {
-      font-size: 2rem;
-      font-weight: 700;
-      margin-top: 0.25rem;
+      font-size: 2.1rem;
+      font-weight: 800;
+      margin-top: 0.3rem;
       line-height: 1;
+      letter-spacing: -0.03em;
     }
-
-    .stat-card.hero .stat-value { font-size: 2.5rem; }
-
+    .stat-card.hero .stat-value { font-size: 2.8rem; }
     .stat-sub {
-      font-size: 0.75rem;
-      color: #475569;
-      margin-top: 0.35rem;
+      font-size: 0.72rem;
+      color: var(--muted);
+      margin-top: 0.4rem;
     }
 
     /* ── Cards ── */
     .card {
-      background: #1e2130;
-      border: 1px solid #2d3348;
-      border-radius: 8px;
-      padding: 1.25rem;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 1.25rem 1.4rem;
+      transition: border-color 0.2s;
     }
+    .card:hover { border-color: var(--border2); }
 
-    .card h2 {
-      font-size: 0.85rem;
+    .card-title {
+      font-size: 0.72rem;
       font-weight: 600;
-      color: #94a3b8;
-      margin-bottom: 1rem;
+      color: var(--muted);
       text-transform: uppercase;
-      letter-spacing: 0.05em;
+      letter-spacing: 0.07em;
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .card-title-note {
+      color: var(--muted2);
+      font-weight: 400;
+      font-size: 0.68rem;
+      letter-spacing: 0.04em;
     }
 
-    /* ── Layout rows ── */
+    /* ── Layout ── */
     .charts-primary {
       display: grid;
       grid-template-columns: 2fr 1fr;
-      gap: 1.5rem;
-      margin-bottom: 1.5rem;
+      gap: 1.25rem;
+      margin-bottom: 1.25rem;
     }
-
     .charts-secondary {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 1.5rem;
-      margin-bottom: 1.5rem;
+      gap: 1.25rem;
+      margin-bottom: 1.25rem;
     }
-
     @media (max-width: 900px) {
       .charts-primary, .charts-secondary { grid-template-columns: 1fr; }
     }
 
     .chart-wrap { position: relative; }
-    .chart-wrap-bar { height: 320px; }
-    .chart-wrap-donut { height: 260px; }
-    .chart-wrap-line { height: 220px; }
+    .chart-wrap-bar  { height: 300px; }
+    .chart-wrap-donut { height: 240px; }
+    .chart-wrap-line { height: 210px; }
 
     /* ── Needs Attention ── */
     .attention-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
       gap: 0.75rem;
       margin-top: 0.5rem;
     }
 
     .attention-item {
-      background: #151925;
-      border: 1px solid #2d3348;
-      border-radius: 6px;
-      padding: 0.75rem 1rem;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 0.85rem 1rem;
       display: flex;
       flex-direction: column;
-      gap: 0.4rem;
+      gap: 0.35rem;
+      position: relative;
+      overflow: hidden;
+      transition: border-color 0.2s, box-shadow 0.2s;
     }
+    .attention-item:hover { border-color: var(--border2); box-shadow: 0 2px 16px rgba(0,0,0,0.3); }
+    .attention-item.below {
+      border-left: 3px solid var(--red);
+      box-shadow: inset 3px 0 12px rgba(248,113,113,0.06);
+    }
+    .attention-item.no-data { border-left: 3px solid var(--muted2); }
 
-    .attention-item.below { border-left: 3px solid #f87171; }
-    .attention-item.no-data { border-left: 3px solid #475569; }
+    @keyframes pulse-border {
+      0%, 100% { box-shadow: inset 3px 0 12px rgba(248,113,113,0.06); }
+      50%       { box-shadow: inset 3px 0 20px rgba(248,113,113,0.18); }
+    }
+    .attention-item.critical { animation: pulse-border 2.5s ease-in-out infinite; }
 
-    .attention-name { font-size: 0.85rem; font-weight: 600; color: #e2e8f0; }
-    .attention-value { font-size: 1.25rem; font-weight: 700; }
-    .attention-sub { font-size: 0.7rem; color: #64748b; }
+    .attention-name { font-size: 0.82rem; font-weight: 600; color: var(--text); }
+    .attention-value { font-size: 1.3rem; font-weight: 800; letter-spacing: -0.02em; }
+    .attention-sub { font-size: 0.68rem; color: var(--muted); }
 
     /* ── Progress bar ── */
     .progress-wrap {
-      background: #0f1117;
+      background: rgba(255,255,255,0.05);
       border-radius: 999px;
-      height: 6px;
+      height: 5px;
       overflow: hidden;
-      margin-top: 4px;
+      margin-top: 3px;
     }
-
     .progress-bar {
       height: 100%;
       border-radius: 999px;
-      transition: width 0.3s;
+      transition: width 0.6s cubic-bezier(0.4,0,0.2,1);
     }
 
     /* ── Table ── */
-    table { width: 100%; border-collapse: collapse; font-size: 0.875rem; }
+    table { width: 100%; border-collapse: collapse; font-size: 0.855rem; }
     th {
       text-align: left;
       padding: 0.5rem 0.75rem;
-      color: #64748b;
-      font-size: 0.75rem;
+      color: var(--muted);
+      font-size: 0.7rem;
       text-transform: uppercase;
-      letter-spacing: 0.05em;
-      border-bottom: 1px solid #2d3348;
+      letter-spacing: 0.07em;
+      border-bottom: 1px solid var(--border);
       cursor: pointer;
       user-select: none;
       white-space: nowrap;
+      font-weight: 500;
     }
     th:hover { color: #94a3b8; }
-    th .sort-icon { margin-left: 0.3em; opacity: 0.4; }
-    th.sorted .sort-icon { opacity: 1; color: #6366f1; }
+    th .sort-icon { margin-left: 0.25em; opacity: 0.35; font-size: 0.65rem; }
+    th.sorted .sort-icon { opacity: 1; color: var(--indigo-lt); }
+    th.no-sort { cursor: default; }
 
-    td { padding: 0.6rem 0.75rem; border-bottom: 1px solid #1a1f2e; vertical-align: middle; }
+    td { padding: 0.6rem 0.75rem; border-bottom: 1px solid rgba(30,34,54,0.8); vertical-align: middle; }
     tr:last-child td { border-bottom: none; }
-    tr:hover td { background: #252a3a; }
+    tr:hover td { background: rgba(255,255,255,0.02); }
 
-    td.coverage-cell { min-width: 160px; }
+    /* Priority group headers */
+    tr.group-header td {
+      background: var(--surface2);
+      color: var(--muted);
+      font-size: 0.68rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      padding: 0.4rem 0.75rem;
+      border-bottom: 1px solid var(--border);
+    }
 
-    /* ── Sparklines ── */
-    td.sparkline-cell { width: 110px; padding-top: 0.4rem; padding-bottom: 0.4rem; }
+    td.coverage-cell { min-width: 150px; }
+    td.sparkline-cell { width: 110px; padding-top: 0.35rem; padding-bottom: 0.35rem; }
     td.sparkline-cell canvas { display: block; }
 
     /* ── Badges ── */
     .badge {
       display: inline-block;
-      padding: 0.2rem 0.6rem;
-      border-radius: 999px;
-      font-size: 0.8rem;
-      font-weight: 600;
+      padding: 0.18rem 0.55rem;
+      border-radius: 5px;
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.01em;
     }
+    .badge-green  { background: var(--green-dim);  color: var(--green); }
+    .badge-yellow { background: var(--yellow-dim); color: var(--yellow); }
+    .badge-red    { background: var(--red-dim);    color: var(--red); }
+    .badge-grey   { background: #1a2035;           color: var(--muted); }
 
-    .badge-green  { background: #14532d; color: #4ade80; }
-    .badge-yellow { background: #713f12; color: #fbbf24; }
-    .badge-red    { background: #7f1d1d; color: #f87171; }
-    .badge-grey   { background: #1e293b; color: #64748b; }
+    .source-tag { font-size: 0.68rem; color: var(--muted2); font-style: italic; }
 
-    .source-tag { font-size: 0.7rem; color: #475569; font-style: italic; }
+    .trend-up   { color: var(--green); font-size: 0.8rem; }
+    .trend-down { color: var(--red);   font-size: 0.8rem; }
+    .trend-flat { color: var(--muted); font-size: 0.8rem; }
 
-    .trend-up   { color: #4ade80; }
-    .trend-down { color: #f87171; }
-    .trend-flat { color: #64748b; }
-
-    /* ── Empty state ── */
-    .empty-note { color: #475569; font-size: 0.85rem; padding: 0.5rem 0; }
+    /* stale indicator */
+    .stale-dot {
+      display: inline-block;
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: var(--yellow);
+      margin-right: 4px;
+      vertical-align: middle;
+      opacity: 0.8;
+    }
 
     /* ── Filter row ── */
     .filter-row {
@@ -212,117 +332,107 @@
       margin-bottom: 1rem;
       flex-wrap: wrap;
     }
-
     .filter-btn {
-      background: #151925;
-      border: 1px solid #2d3348;
+      background: var(--surface2);
+      border: 1px solid var(--border);
       border-radius: 6px;
-      color: #94a3b8;
-      font-size: 0.75rem;
-      padding: 0.3rem 0.75rem;
+      color: var(--muted);
+      font-size: 0.73rem;
+      font-weight: 500;
+      padding: 0.3rem 0.8rem;
       cursor: pointer;
-      transition: background 0.15s, border-color 0.15s;
+      transition: all 0.15s;
     }
-
-    .filter-btn:hover { background: #1e2130; border-color: #3b4268; }
-    .filter-btn.active { background: #1e2846; border-color: #6366f1; color: #818cf8; }
+    .filter-btn:hover { border-color: var(--border2); color: var(--text); }
+    .filter-btn.active { background: var(--indigo-dim); border-color: var(--indigo); color: var(--indigo-lt); }
 
     /* ── Donut legend ── */
-    .donut-legend {
-      display: flex;
-      flex-direction: column;
-      gap: 0.5rem;
-      margin-top: 1rem;
-      font-size: 0.8rem;
-    }
-    .donut-legend-item {
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-    }
-    .legend-dot {
-      width: 10px;
-      height: 10px;
-      border-radius: 50%;
-      flex-shrink: 0;
-    }
+    .donut-legend { display: flex; flex-direction: column; gap: 0.45rem; margin-top: 0.85rem; font-size: 0.78rem; }
+    .donut-legend-item { display: flex; align-items: center; gap: 0.5rem; }
+    .legend-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
     .legend-label { color: #94a3b8; flex: 1; }
-    .legend-count { color: #64748b; }
+    .legend-count { color: var(--muted); font-weight: 600; }
 
-    /* ── Copy button ── */
-    .copy-btn {
+    /* ── Empty state ── */
+    .empty-note { color: var(--muted); font-size: 0.82rem; padding: 0.5rem 0; }
+
+    /* ── Divider ── */
+    .section-gap { margin-bottom: 1.25rem; }
+
+    /* ── Push date chip ── */
+    .push-chip {
       display: inline-flex;
       align-items: center;
-      gap: 0.4em;
-      background: #1e2130;
-      border: 1px solid #2d3348;
-      border-radius: 6px;
-      color: #94a3b8;
-      font-size: 0.8rem;
-      padding: 0.4rem 0.9rem;
-      cursor: pointer;
-      transition: background 0.15s, border-color 0.15s, color 0.15s;
+      gap: 0.3em;
+      font-size: 0.7rem;
+      color: var(--muted);
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 0.1rem 0.45rem;
       white-space: nowrap;
     }
-    .copy-btn:hover { background: #252a3a; border-color: #3b4268; color: #e2e8f0; }
-    .copy-btn.copied { background: #14532d; border-color: #4ade80; color: #4ade80; }
+    .push-chip.stale { border-color: rgba(251,191,36,0.3); color: var(--yellow); }
   </style>
 </head>
 <body>
 
 <header>
-  <div>
-    <h1>Backend Coverage Dashboard</h1>
-    <div class="subtitle">LegalSifter microservices — unit test coverage</div>
+  <div class="logo-area">
+    <h1>Coverage Dashboard</h1>
+    <div class="subtitle">LegalSifter microservices · unit test coverage</div>
   </div>
-  <div style="display:flex;align-items:center;gap:0.75rem;flex-wrap:wrap;">
+  <div class="header-right">
+    <div class="meta" id="meta">Loading…</div>
     <button class="copy-btn" id="copyBtn" onclick="copyCoverage()">
       <svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
         <rect x="5" y="5" width="9" height="9" rx="1.5"/><path d="M11 5V3.5A1.5 1.5 0 0 0 9.5 2h-6A1.5 1.5 0 0 0 2 3.5v6A1.5 1.5 0 0 0 3.5 11H5"/>
       </svg>
-      Copy Coverage Numbers
+      Copy Numbers
     </button>
-    <div class="meta" id="meta">Loading…</div>
   </div>
 </header>
 
 <!-- KPI row -->
 <div class="kpi-row" id="kpi-row"></div>
 
-<!-- Primary charts: big bar + donut -->
-<div class="charts-primary">
+<!-- Primary charts -->
+<div class="charts-primary section-gap">
   <div class="card">
-    <h2>Coverage by Service <span style="color:#3b4268;font-weight:400;font-size:0.75rem;margin-left:0.5em">sorted · 80% target line</span></h2>
+    <div class="card-title">
+      Coverage by Service
+      <span class="card-title-note">sorted · 80% target</span>
+    </div>
     <div class="chart-wrap chart-wrap-bar"><canvas id="barChart"></canvas></div>
   </div>
   <div class="card" style="display:flex;flex-direction:column;">
-    <h2>Fleet Health Distribution</h2>
+    <div class="card-title">Fleet Health</div>
     <div class="chart-wrap chart-wrap-donut"><canvas id="donutChart"></canvas></div>
     <div class="donut-legend" id="donutLegend"></div>
   </div>
 </div>
 
 <!-- Needs Attention -->
-<div class="card" id="attention-card" style="margin-bottom:1.5rem;display:none;">
-  <h2>Needs Attention</h2>
+<div class="card section-gap" id="attention-card" style="display:none;">
+  <div class="card-title">Needs Attention</div>
   <div class="attention-grid" id="attention-grid"></div>
 </div>
 
-<!-- Secondary charts: trend line + (future: sparklines) -->
-<div class="charts-secondary">
+<!-- Secondary charts -->
+<div class="charts-secondary section-gap">
   <div class="card">
-    <h2>Coverage Trend Over Time</h2>
+    <div class="card-title">Coverage Trend <span class="card-title-note">zoomed to data range</span></div>
     <div class="chart-wrap chart-wrap-line"><canvas id="lineChart"></canvas></div>
   </div>
   <div class="card">
-    <h2>30-Day Change by Service</h2>
+    <div class="card-title">30-Day Change by Service</div>
     <div class="chart-wrap chart-wrap-line"><canvas id="deltaChart"></canvas></div>
   </div>
 </div>
 
-<!-- Detail table -->
+<!-- Service detail table -->
 <div class="card">
-  <h2>Service Detail</h2>
+  <div class="card-title" style="margin-bottom:0.75rem">Service Detail</div>
   <div class="filter-row" id="filter-row">
     <button class="filter-btn active" data-filter="all">All</button>
     <button class="filter-btn" data-filter="green">≥ 80%</button>
@@ -335,9 +445,10 @@
       <tr>
         <th data-col="name">Service <span class="sort-icon">↕</span></th>
         <th data-col="pct">Coverage <span class="sort-icon">↕</span></th>
-        <th style="cursor:default">History</th>
+        <th class="no-sort">History</th>
         <th data-col="date">Last Updated <span class="sort-icon">↕</span></th>
-        <th data-col="delta">7-day Trend <span class="sort-icon">↕</span></th>
+        <th data-col="delta">7d Trend <span class="sort-icon">↕</span></th>
+        <th data-col="pushed_at">Repo Activity <span class="sort-icon">↕</span></th>
         <th data-col="source">Source</th>
       </tr>
     </thead>
@@ -346,40 +457,17 @@
 </div>
 
 <script>
-  const CSV_URL = "./coverage-history.csv";
-  const TARGET = 80;
-
-  function copyCoverage() {
-    const lines = tableData
-      .slice()
-      .sort((a, b) => a.name.localeCompare(b.name))
-      .map(r => `${r.name}: ${r.pct !== null ? r.pct.toFixed(1) + '%' : 'N/A'}`)
-      .join('\n');
-
-    navigator.clipboard.writeText(lines).then(() => {
-      const btn = document.getElementById('copyBtn');
-      btn.classList.add('copied');
-      btn.innerHTML = `
-        <svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <polyline points="2 8 6 12 14 4"/>
-        </svg>
-        Copied!`;
-      setTimeout(() => {
-        btn.classList.remove('copied');
-        btn.innerHTML = `
-          <svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-            <rect x="5" y="5" width="9" height="9" rx="1.5"/><path d="M11 5V3.5A1.5 1.5 0 0 0 9.5 2h-6A1.5 1.5 0 0 0 2 3.5v6A1.5 1.5 0 0 0 3.5 11H5"/>
-          </svg>
-          Copy Coverage Numbers`;
-      }, 2000);
-    });
-  }
+  const CSV_URL  = "./coverage-history.csv";
+  const TARGET   = 80;
+  const STALE_DAYS = 60; // repo with no push in 60+ days is flagged stale
 
   const COLOR_PALETTE = [
     "#6366f1","#22d3ee","#f59e0b","#34d399","#f87171",
     "#a78bfa","#fb923c","#4ade80","#38bdf8","#e879f9",
     "#facc15","#2dd4bf","#f472b6","#60a5fa","#a3e635",
   ];
+
+  // ── Helpers ──────────────────────────────────────────────────────────────
 
   function badge(pct) {
     if (pct === null) return `<span class="badge badge-grey">N/A</span>`;
@@ -389,7 +477,7 @@
   }
 
   function barColor(pct) {
-    if (pct === null) return "#334155";
+    if (pct === null) return "#1e2236";
     if (pct >= 80) return "#4ade80";
     if (pct >= 60) return "#fbbf24";
     return "#f87171";
@@ -409,15 +497,48 @@
     return `<div class="progress-wrap"><div class="progress-bar" style="width:${w}%;background:${color}"></div></div>`;
   }
 
-  // ── Table sort state ──
-  let sortCol = 'pct';
-  let sortDir = 1; // 1 = asc, -1 = desc
+  function daysSince(dateStr) {
+    if (!dateStr) return null;
+    const diff = Date.now() - new Date(dateStr).getTime();
+    return Math.floor(diff / 86400000);
+  }
+
+  function pushChip(pushedAt) {
+    if (!pushedAt) return '<span class="source-tag">—</span>';
+    const days = daysSince(pushedAt);
+    if (days === null) return '<span class="source-tag">—</span>';
+    const label = days === 0 ? 'today' : days === 1 ? '1d ago' : `${days}d ago`;
+    const stale = days >= STALE_DAYS;
+    return `<span class="push-chip${stale ? ' stale' : ''}">${stale ? '<span class="stale-dot"></span>' : ''}${label}</span>`;
+  }
+
+  // animated counter
+  function animateCount(el, target, suffix = '', duration = 800) {
+    const start = performance.now();
+    const from = 0;
+    function step(now) {
+      const p = Math.min((now - start) / duration, 1);
+      const ease = 1 - Math.pow(1 - p, 3);
+      el.textContent = (from + (target - from) * ease).toFixed(suffix === '%' ? 1 : 0) + suffix;
+      if (p < 1) requestAnimationFrame(step);
+    }
+    requestAnimationFrame(step);
+  }
+
+  // ── Table state ──────────────────────────────────────────────────────────
+  let sortCol   = 'priority';
+  let sortDir   = 1;
   let filterState = 'all';
-  let tableData = [];
+  let tableData   = [];
   const sparkCharts = {};
 
+  function priorityOf(r) {
+    if (r.pct === null) return 3;         // no data — lowest
+    if (r.pct < TARGET) return 1;         // below target — highest
+    return 2;                             // at target
+  }
+
   function renderTable() {
-    // Destroy existing sparkline instances to avoid canvas reuse errors
     for (const key of Object.keys(sparkCharts)) {
       sparkCharts[key].destroy();
       delete sparkCharts[key];
@@ -428,7 +549,6 @@
 
     let rows = [...tableData];
 
-    // Filter
     if (filterState !== 'all') {
       rows = rows.filter(r => {
         const p = r.pct;
@@ -440,32 +560,59 @@
       });
     }
 
-    // Sort
     rows.sort((a, b) => {
+      // priority sort: always group by tier first when sortCol === 'priority'
+      if (sortCol === 'priority') {
+        const pd = priorityOf(a) - priorityOf(b);
+        if (pd !== 0) return pd;
+        // within below-target: worst first
+        if (priorityOf(a) === 1) return (a.pct ?? 100) - (b.pct ?? 100);
+        // within at-target: highest first
+        if (priorityOf(a) === 2) return (b.pct ?? 0) - (a.pct ?? 0);
+        return a.name.localeCompare(b.name);
+      }
       let av = a[sortCol], bv = b[sortCol];
       if (av === null && bv === null) return 0;
-      if (av === null) return 1;  // nulls always last
+      if (av === null) return 1;
       if (bv === null) return -1;
       if (typeof av === 'string') return av.localeCompare(bv) * sortDir;
       return (av - bv) * sortDir;
     });
 
+    // Render with group headers when using priority sort
+    let lastGroup = null;
+    const groupLabels = { 1: '⚠ Below Target', 2: '✓ At Target', 3: 'No Coverage Data' };
+
     for (const r of rows) {
-      const tr = document.createElement("tr");
-      tr.dataset.filter = r.pct === null ? 'na' : r.pct >= 80 ? 'green' : r.pct >= 60 ? 'warn' : 'red';
+      if (sortCol === 'priority' && filterState === 'all') {
+        const group = priorityOf(r);
+        if (group !== lastGroup) {
+          lastGroup = group;
+          const gtr = document.createElement("tr");
+          gtr.className = "group-header";
+          gtr.innerHTML = `<td colspan="7">${groupLabels[group]}</td>`;
+          tbody.appendChild(gtr);
+        }
+      }
+
       const hasHistory = r.history && r.history.filter(h => h.pct !== null).length >= 1;
+      const tr = document.createElement("tr");
       tr.innerHTML = `
-        <td><strong style="color:#e2e8f0">${r.name}</strong></td>
+        <td><strong style="color:var(--text)">${r.name}</strong></td>
         <td class="coverage-cell">${badge(r.pct)}${progressBar(r.pct)}</td>
-        <td class="sparkline-cell">${hasHistory ? `<canvas id="spark-${r.name}" width="100" height="36"></canvas>` : '<span style="color:#334155;font-size:0.75rem">—</span>'}</td>
-        <td style="color:#64748b;font-size:0.8rem">${r.date}</td>
+        <td class="sparkline-cell">${hasHistory
+          ? `<canvas id="spark-${r.name}" width="100" height="34"></canvas>`
+          : '<span style="color:var(--muted2);font-size:0.75rem">—</span>'
+        }</td>
+        <td style="color:var(--muted);font-size:0.78rem">${r.date}</td>
         <td>${trendArrow(r.delta)}</td>
+        <td>${pushChip(r.pushed_at)}</td>
         <td><span class="source-tag">${r.source}</span></td>
       `;
       tbody.appendChild(tr);
     }
 
-    // Render sparklines after rows are in the DOM
+    // Sparklines
     for (const r of rows) {
       if (!r.history) continue;
       const validHistory = r.history.filter(h => h.pct !== null);
@@ -475,46 +622,28 @@
 
       const color = barColor(r.pct);
       const yValues = r.history.map(h => h.pct);
-      const allNull = yValues.every(v => v === null);
-      if (allNull) continue;
-
-      // Y-axis range: pad around the actual data range so the line isn't flat at edge
       const defined = yValues.filter(v => v !== null);
-      const minY = Math.max(0, Math.min(...defined) - 5);
-      const maxY = Math.min(100, Math.max(...defined) + 5);
+      if (!defined.length) continue;
+      const minY = Math.max(0,   Math.min(...defined) - 3);
+      const maxY = Math.min(100, Math.max(...defined) + 3);
 
       sparkCharts[r.name] = new Chart(canvas, {
         type: 'line',
         data: {
           labels: r.history.map(h => h.date),
-          datasets: [{
-            data: yValues,
-            borderColor: color,
-            backgroundColor: color + '22',
-            borderWidth: 1.5,
-            pointRadius: 0,
-            spanGaps: true,
-            tension: 0.3,
-            fill: true,
-          }],
+          datasets: [{ data: yValues, borderColor: color, backgroundColor: color + '18',
+            borderWidth: 1.5, pointRadius: 0, spanGaps: true, tension: 0.3, fill: true }],
         },
         options: {
-          responsive: false,
-          animation: false,
-          plugins: {
-            legend: { display: false },
-            tooltip: { enabled: false },
-          },
-          scales: {
-            x: { display: false },
-            y: { display: false, min: minY, max: maxY },
-          },
+          responsive: false, animation: false,
+          plugins: { legend: { display: false }, tooltip: { enabled: false } },
+          scales: { x: { display: false }, y: { display: false, min: minY, max: maxY } },
         },
       });
     }
 
-    // Update sort icons
-    document.querySelectorAll("#detail-table th").forEach(th => {
+    // Sort icons
+    document.querySelectorAll("#detail-table th[data-col]").forEach(th => {
       th.classList.remove("sorted");
       const icon = th.querySelector(".sort-icon");
       if (icon) icon.textContent = "↕";
@@ -527,19 +656,64 @@
     }
   }
 
+  // ── Copy ─────────────────────────────────────────────────────────────────
+  function copyCoverage() {
+    const lines = tableData
+      .slice().sort((a, b) => a.name.localeCompare(b.name))
+      .map(r => `${r.name}: ${r.pct !== null ? r.pct.toFixed(1) + '%' : 'N/A'}`)
+      .join('\n');
+
+    navigator.clipboard.writeText(lines).then(() => {
+      const btn = document.getElementById('copyBtn');
+      btn.classList.add('copied');
+      btn.innerHTML = `<svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="2 8 6 12 14 4"/></svg> Copied!`;
+      setTimeout(() => {
+        btn.classList.remove('copied');
+        btn.innerHTML = `<svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="5" width="9" height="9" rx="1.5"/><path d="M11 5V3.5A1.5 1.5 0 0 0 9.5 2h-6A1.5 1.5 0 0 0 2 3.5v6A1.5 1.5 0 0 0 3.5 11H5"/></svg> Copy Numbers`;
+      }, 2200);
+    });
+  }
+
+  // ── Target line plugin (reusable) ─────────────────────────────────────────
+  const targetLinePlugin = (color = '#6366f1', dash = [6,4], label = null) => ({
+    id: 'targetLine',
+    afterDraw(chart) {
+      if (!chart.scales.y) return;
+      const { ctx, chartArea: { left, right }, scales: { y } } = chart;
+      if (y.min > TARGET || y.max < TARGET) return;
+      const yPos = y.getPixelForValue(TARGET);
+      ctx.save();
+      ctx.beginPath();
+      ctx.setLineDash(dash);
+      ctx.moveTo(left, yPos);
+      ctx.lineTo(right, yPos);
+      ctx.strokeStyle = color;
+      ctx.lineWidth = 1.5;
+      ctx.stroke();
+      if (label) {
+        ctx.setLineDash([]);
+        ctx.font = '10px sans-serif';
+        ctx.fillStyle = color;
+        ctx.fillText(label, left + 4, yPos - 4);
+      }
+      ctx.restore();
+    },
+  });
+
+  // ── Load ─────────────────────────────────────────────────────────────────
   async function load() {
     const resp = await fetch(CSV_URL);
     const text = await resp.text();
     const { data } = Papa.parse(text, { header: true, skipEmptyLines: true });
 
-    // Group by repo
     const byRepo = {};
     for (const row of data) {
       if (!byRepo[row.repo]) byRepo[row.repo] = [];
       byRepo[row.repo].push({
-        date: row.date,
-        pct: row.coverage_pct !== "" ? parseFloat(row.coverage_pct) : null,
-        source: row.source,
+        date:      row.date,
+        pct:       row.coverage_pct !== "" ? parseFloat(row.coverage_pct) : null,
+        source:    row.source,
+        pushed_at: row.repo_pushed_at || "",
       });
     }
     for (const r of Object.keys(byRepo)) {
@@ -547,7 +721,7 @@
     }
 
     const allDates = [...new Set(data.map(r => r.date))].sort();
-    const repos = Object.keys(byRepo).sort();
+    const repos    = Object.keys(byRepo).sort();
     const lastDate = allDates[allDates.length - 1];
 
     const latest = {};
@@ -557,220 +731,147 @@
     }
 
     document.getElementById("meta").textContent =
-      `Last updated ${lastDate} · ${repos.length} services tracked`;
+      `Updated ${lastDate} · ${repos.length} services`;
 
-    // ── Compute stats ──
-    const validPcts = repos.map(r => latest[r]?.pct).filter(p => p !== null);
-    const avg = validPcts.length ? validPcts.reduce((a, b) => a + b, 0) / validPcts.length : null;
-    const atTarget = validPcts.filter(p => p >= TARGET).length;
-    const below60  = validPcts.filter(p => p < 60).length;
+    // ── Stats ──
+    const validPcts   = repos.map(r => latest[r]?.pct).filter(p => p !== null);
+    const avg         = validPcts.length ? validPcts.reduce((a, b) => a + b, 0) / validPcts.length : null;
+    const atTarget    = validPcts.filter(p => p >= TARGET).length;
+    const below60     = validPcts.filter(p => p < 60).length;
     const notReporting = repos.filter(r => latest[r]?.pct === null).length;
-    const highest = validPcts.length ? Math.max(...validPcts) : null;
-    const highestRepo = highest !== null
-      ? repos.find(r => latest[r]?.pct === highest)?.split("/")[1]
-      : null;
-
-    // ── KPI row ──
+    const highest     = validPcts.length ? Math.max(...validPcts) : null;
+    const highestRepo = highest !== null ? repos.find(r => latest[r]?.pct === highest)?.split("/")[1] : null;
     const targetColor = atTarget === repos.length ? '#4ade80'
                       : atTarget >= repos.length * 0.7 ? '#fbbf24' : '#f87171';
 
+    // ── KPI cards ──
     document.getElementById("kpi-row").innerHTML = `
       <div class="stat-card hero">
-        <div class="stat-label">Services Meeting Target (≥${TARGET}%)</div>
-        <div class="stat-value" style="color:${targetColor}">${atTarget} <span style="font-size:1.25rem;color:#475569">/ ${repos.length}</span></div>
+        <div class="stat-label">Services Meeting Target ≥ ${TARGET}%</div>
+        <div class="stat-value" id="kpi-target" style="color:${targetColor}">0 <span style="font-size:1.4rem;color:var(--muted2)">/ ${repos.length}</span></div>
         <div class="stat-sub">${validPcts.length} reporting · ${notReporting} no data</div>
       </div>
       <div class="stat-card">
-        <div class="stat-label">Fleet Avg Coverage</div>
-        <div class="stat-value" style="color:${avg >= 80 ? '#4ade80' : avg >= 60 ? '#fbbf24' : '#f87171'}">${avg !== null ? avg.toFixed(1) + '%' : 'N/A'}</div>
-        <div class="stat-sub">across ${validPcts.length} reporting</div>
+        <div class="stat-label">Fleet Average</div>
+        <div class="stat-value" id="kpi-avg" style="color:${avg >= 80 ? '#4ade80' : avg >= 60 ? '#fbbf24' : '#f87171'}">0%</div>
+        <div class="stat-sub">${validPcts.length} services reporting</div>
       </div>
       <div class="stat-card">
         <div class="stat-label">Highest Coverage</div>
-        <div class="stat-value" style="color:#4ade80">${highest !== null ? highest.toFixed(1) + '%' : 'N/A'}</div>
+        <div class="stat-value" style="color:#4ade80">${highest !== null ? highest.toFixed(1) + '%' : '—'}</div>
         <div class="stat-sub">${highestRepo || '—'}</div>
       </div>
       <div class="stat-card">
         <div class="stat-label">Below Target</div>
-        <div class="stat-value" style="color:${(validPcts.length - atTarget) > 0 ? '#f87171' : '#4ade80'}">${validPcts.length - atTarget}</div>
-        <div class="stat-sub">${below60} below 60%</div>
+        <div class="stat-value" id="kpi-below" style="color:${(validPcts.length - atTarget) > 0 ? '#f87171' : '#4ade80'}">0</div>
+        <div class="stat-sub">${below60} critical (below 60%)</div>
       </div>
       <div class="stat-card">
         <div class="stat-label">Not Reporting</div>
-        <div class="stat-value" style="color:${notReporting > 0 ? '#fbbf24' : '#4ade80'}">${notReporting}</div>
-        <div class="stat-sub">no coverage data</div>
+        <div class="stat-value" id="kpi-na" style="color:${notReporting > 0 ? '#fbbf24' : '#4ade80'}">0</div>
+        <div class="stat-sub">no coverage artifact</div>
       </div>
     `;
 
-    // ── Bar chart (sorted descending) ──
-    const sortedRepos = [...repos].sort((a, b) => {
-      const pa = latest[a]?.pct ?? -1;
-      const pb = latest[b]?.pct ?? -1;
-      return pb - pa;
-    });
+    // Animated counters
+    animateCount(document.getElementById('kpi-target'), atTarget);
+    if (avg !== null) animateCount(document.getElementById('kpi-avg'), avg, '%');
+    animateCount(document.getElementById('kpi-below'), validPcts.length - atTarget);
+    animateCount(document.getElementById('kpi-na'), notReporting);
 
+    // ── Bar chart (sorted, 0-100) ──
+    const sortedRepos = [...repos].sort((a, b) => (latest[b]?.pct ?? -1) - (latest[a]?.pct ?? -1));
     const barData = sortedRepos.map(r => latest[r]?.pct ?? 0);
+
     new Chart(document.getElementById("barChart"), {
       type: "bar",
       data: {
         labels: sortedRepos.map(r => r.split("/")[1]),
-        datasets: [{
-          label: "Coverage %",
-          data: barData,
-          backgroundColor: barData.map(v => latest[sortedRepos[barData.indexOf(v)]]?.pct === null ? "#334155" : barColor(v)),
-          borderRadius: 4,
-        }],
+        datasets: [{ label: "Coverage %", data: barData,
+          backgroundColor: sortedRepos.map(r => barColor(latest[r]?.pct)),
+          borderRadius: 4 }],
       },
       options: {
-        responsive: true,
-        maintainAspectRatio: false,
+        responsive: true, maintainAspectRatio: false,
         plugins: {
           legend: { display: false },
-          tooltip: {
-            callbacks: {
-              label: ctx => ` ${ctx.raw.toFixed(1)}%`,
-            },
-          },
-          annotation: {
-            annotations: {
-              targetLine: {
-                type: 'line',
-                yMin: TARGET, yMax: TARGET,
-                borderColor: '#6366f1',
-                borderWidth: 2,
-                borderDash: [6, 3],
-                label: {
-                  content: `${TARGET}% target`,
-                  display: true,
-                  color: '#818cf8',
-                  font: { size: 11 },
-                  position: 'start',
-                  backgroundColor: 'transparent',
-                  padding: 0,
-                },
-              },
-            },
-          },
+          tooltip: { callbacks: { label: ctx => ` ${ctx.raw.toFixed(1)}%` } },
         },
         scales: {
-          x: { ticks: { color: "#94a3b8", font: { size: 10 } }, grid: { color: "#1e293b" } },
-          y: {
-            min: 0, max: 100,
-            ticks: { color: "#94a3b8", callback: v => v + "%" },
-            grid: { color: "#2d3348" },
-          },
+          x: { ticks: { color: "#64748b", font: { size: 10 } }, grid: { color: "#1a1f2e" } },
+          y: { min: 0, max: 100,
+            ticks: { color: "#64748b", callback: v => v + "%" },
+            grid: { color: "#1a1f2e" } },
         },
       },
-      plugins: [{
-        // Inline plugin: draw the 80% target line without needing chartjs-plugin-annotation
-        id: 'targetLine',
-        afterDraw(chart) {
-          const { ctx, chartArea: { left, right }, scales: { y } } = chart;
-          const yPos = y.getPixelForValue(TARGET);
-          ctx.save();
-          ctx.beginPath();
-          ctx.setLineDash([6, 4]);
-          ctx.moveTo(left, yPos);
-          ctx.lineTo(right, yPos);
-          ctx.strokeStyle = '#6366f1';
-          ctx.lineWidth = 2;
-          ctx.stroke();
-          ctx.setLineDash([]);
-          ctx.font = '11px sans-serif';
-          ctx.fillStyle = '#818cf8';
-          ctx.fillText(`${TARGET}% target`, left + 4, yPos - 5);
-          ctx.restore();
-        },
-      }],
+      plugins: [targetLinePlugin('#6366f1', [6,4], `${TARGET}% target`)],
     });
 
     // ── Donut chart ──
     const countGreen  = validPcts.filter(p => p >= 80).length;
     const countYellow = validPcts.filter(p => p >= 60 && p < 80).length;
     const countRed    = validPcts.filter(p => p < 60).length;
-    const countNA     = notReporting;
-
-    const donutLabels = ['≥ 80% (on target)', '60–79% (warning)', '< 60% (critical)', 'No data'];
-    const donutColors = ['#4ade80', '#fbbf24', '#f87171', '#334155'];
-    const donutCounts = [countGreen, countYellow, countRed, countNA];
+    const donutLabels = ['≥ 80% on target', '60–79% warning', '< 60% critical', 'No data'];
+    const donutColors = ['#4ade80', '#fbbf24', '#f87171', '#1e2236'];
+    const donutCounts = [countGreen, countYellow, countRed, notReporting];
 
     new Chart(document.getElementById("donutChart"), {
       type: "doughnut",
-      data: {
-        labels: donutLabels,
-        datasets: [{
-          data: donutCounts,
-          backgroundColor: donutColors,
-          borderColor: '#0f1117',
-          borderWidth: 3,
-        }],
-      },
+      data: { labels: donutLabels,
+        datasets: [{ data: donutCounts, backgroundColor: donutColors,
+          borderColor: '#0b0d14', borderWidth: 3 }] },
       options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        cutout: '65%',
+        responsive: true, maintainAspectRatio: false, cutout: '68%',
         plugins: {
           legend: { display: false },
-          tooltip: {
-            callbacks: {
-              label: ctx => ` ${ctx.label}: ${ctx.raw} service${ctx.raw !== 1 ? 's' : ''}`,
-            },
-          },
+          tooltip: { callbacks: { label: ctx => ` ${ctx.label}: ${ctx.raw}` } },
         },
       },
     });
 
-    // Donut legend (manual, easier to read)
     const legendEl = document.getElementById("donutLegend");
     donutLabels.forEach((label, i) => {
       if (donutCounts[i] === 0) return;
-      legendEl.innerHTML += `
-        <div class="donut-legend-item">
-          <div class="legend-dot" style="background:${donutColors[i]}"></div>
-          <span class="legend-label">${label}</span>
-          <span class="legend-count">${donutCounts[i]}</span>
-        </div>`;
+      legendEl.innerHTML += `<div class="donut-legend-item">
+        <div class="legend-dot" style="background:${donutColors[i]}"></div>
+        <span class="legend-label">${label}</span>
+        <span class="legend-count">${donutCounts[i]}</span>
+      </div>`;
     });
 
-    // ── Needs Attention panel ──
-    const attention = [];
-    for (const repo of repos) {
-      const cur = latest[repo];
-      if (cur.pct !== null && cur.pct < TARGET) {
-        attention.push({ repo, cur, type: 'below' });
-      } else if (cur.pct === null) {
-        attention.push({ repo, cur, type: 'no-data' });
-      }
-    }
+    // ── Needs Attention ──
+    const attention = repos
+      .filter(r => latest[r]?.pct === null || latest[r]?.pct < TARGET)
+      .sort((a, b) => (latest[a]?.pct ?? 101) - (latest[b]?.pct ?? 101));
 
     if (attention.length > 0) {
       const card = document.getElementById("attention-card");
       const grid = document.getElementById("attention-grid");
       card.style.display = '';
-
-      for (const { repo, cur, type } of attention) {
+      for (const repo of attention) {
+        const cur = latest[repo];
         const name = repo.split("/")[1];
         const div = document.createElement("div");
-        div.className = `attention-item ${type === 'below' ? 'below' : 'no-data'}`;
-        if (type === 'below') {
+        const isCritical = cur.pct !== null && cur.pct < 60;
+        if (cur.pct !== null) {
+          div.className = `attention-item below${isCritical ? ' critical' : ''}`;
           div.innerHTML = `
             <div class="attention-name">${name}</div>
             <div class="attention-value" style="color:${barColor(cur.pct)}">${cur.pct.toFixed(1)}%</div>
             <div class="progress-wrap"><div class="progress-bar" style="width:${cur.pct}%;background:${barColor(cur.pct)}"></div></div>
-            <div class="attention-sub">${(TARGET - cur.pct).toFixed(1)}pp below target · ${cur.date}</div>
-          `;
+            <div class="attention-sub">${(TARGET - cur.pct).toFixed(1)}pp to target</div>`;
         } else {
+          div.className = 'attention-item no-data';
           div.innerHTML = `
             <div class="attention-name">${name}</div>
-            <div class="attention-value" style="color:#475569">N/A</div>
-            <div class="attention-sub">No coverage data · ${cur.date}</div>
-          `;
+            <div class="attention-value" style="color:var(--muted2)">N/A</div>
+            <div class="attention-sub">No artifact</div>`;
         }
         grid.appendChild(div);
       }
     }
 
-    // ── Line chart (trend over time) ──
+    // ── Trend line — zoomed to data range ──
     const lineDatasets = repos.map((repo, i) => {
       const rows = byRepo[repo];
       if (rows.length <= 1) return null;
@@ -780,67 +881,46 @@
         data: allDates.map(d => pointsByDate[d] ?? null),
         borderColor: COLOR_PALETTE[i % COLOR_PALETTE.length],
         backgroundColor: "transparent",
-        pointRadius: 2,
-        borderWidth: 2,
-        spanGaps: true,
-        tension: 0.3,
+        pointRadius: 2, borderWidth: 1.5, spanGaps: true, tension: 0.3,
       };
     }).filter(Boolean);
+
+    // Calculate y range from actual data
+    const allLineVals = lineDatasets.flatMap(ds => ds.data.filter(v => v !== null));
+    const lineMin = allLineVals.length ? Math.max(0,   Math.floor(Math.min(...allLineVals)) - 5) : 0;
+    const lineMax = allLineVals.length ? Math.min(100, Math.ceil(Math.max(...allLineVals))  + 5) : 100;
 
     new Chart(document.getElementById("lineChart"), {
       type: "line",
       data: { labels: allDates, datasets: lineDatasets },
       options: {
-        responsive: true,
-        maintainAspectRatio: false,
+        responsive: true, maintainAspectRatio: false,
         plugins: {
-          legend: {
-            labels: { color: "#94a3b8", font: { size: 10 }, boxWidth: 12 },
-          },
+          legend: { labels: { color: "#64748b", font: { size: 10 }, boxWidth: 10 } },
         },
         scales: {
-          x: { ticks: { color: "#94a3b8", font: { size: 10 }, maxTicksLimit: 10 }, grid: { color: "#1e293b" } },
-          y: {
-            min: 0, max: 100,
-            ticks: { color: "#94a3b8", callback: v => v + "%" },
-            grid: { color: "#2d3348" },
-          },
+          x: { ticks: { color: "#64748b", font: { size: 10 }, maxTicksLimit: 10 }, grid: { color: "#1a1f2e" } },
+          y: { min: lineMin, max: lineMax,
+            ticks: { color: "#64748b", callback: v => v + "%" },
+            grid: { color: "#1a1f2e" } },
         },
       },
-      plugins: [{
-        id: 'targetLine',
-        afterDraw(chart) {
-          const { ctx, chartArea: { left, right }, scales: { y } } = chart;
-          const yPos = y.getPixelForValue(TARGET);
-          ctx.save();
-          ctx.beginPath();
-          ctx.setLineDash([6, 4]);
-          ctx.moveTo(left, yPos);
-          ctx.lineTo(right, yPos);
-          ctx.strokeStyle = '#3b4268';
-          ctx.lineWidth = 1;
-          ctx.stroke();
-          ctx.restore();
-        },
-      }],
+      plugins: [targetLinePlugin('#3b4268', [5,3])],
     });
 
-    // ── 30-day delta chart ──
-    const thirtyDaysAgo = new Date(lastDate);
-    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
-    const iso30 = thirtyDaysAgo.toISOString().slice(0, 10);
+    // ── 30-day delta ──
+    const thirtyAgo = new Date(lastDate);
+    thirtyAgo.setDate(thirtyAgo.getDate() - 30);
+    const iso30 = thirtyAgo.toISOString().slice(0, 10);
 
     const deltaData = repos.map(repo => {
       const rows = byRepo[repo];
       const cur = rows[rows.length - 1];
-      if (cur.pct === null) return { name: repo.split("/")[1], delta: null };
+      if (cur.pct === null) return null;
       const older = rows.filter(r => r.date <= iso30 && r.pct !== null);
       const old = older.length ? older[older.length - 1] : null;
-      return {
-        name: repo.split("/")[1],
-        delta: old ? cur.pct - old.pct : null,
-      };
-    }).filter(d => d.delta !== null);
+      return old ? { name: repo.split("/")[1], delta: cur.pct - old.pct } : null;
+    }).filter(Boolean);
 
     deltaData.sort((a, b) => a.delta - b.delta);
 
@@ -850,97 +930,80 @@
         data: {
           labels: deltaData.map(d => d.name),
           datasets: [{
-            label: "30-day change (pp)",
             data: deltaData.map(d => d.delta),
-            backgroundColor: deltaData.map(d => d.delta >= 0 ? '#4ade8066' : '#f8717166'),
-            borderColor: deltaData.map(d => d.delta >= 0 ? '#4ade80' : '#f87171'),
-            borderWidth: 1,
-            borderRadius: 3,
+            backgroundColor: deltaData.map(d => d.delta >= 0 ? '#4ade8033' : '#f8717133'),
+            borderColor:     deltaData.map(d => d.delta >= 0 ? '#4ade80'   : '#f87171'),
+            borderWidth: 1, borderRadius: 3,
           }],
         },
         options: {
-          responsive: true,
-          maintainAspectRatio: false,
+          responsive: true, maintainAspectRatio: false,
           plugins: {
             legend: { display: false },
-            tooltip: {
-              callbacks: {
-                label: ctx => ` ${ctx.raw >= 0 ? '+' : ''}${ctx.raw.toFixed(1)}pp`,
-              },
-            },
+            tooltip: { callbacks: { label: ctx => ` ${ctx.raw >= 0 ? '+' : ''}${ctx.raw.toFixed(1)}pp` } },
           },
           scales: {
-            x: { ticks: { color: "#94a3b8", font: { size: 10 } }, grid: { color: "#1e293b" } },
-            y: {
-              ticks: { color: "#94a3b8", callback: v => (v >= 0 ? '+' : '') + v + 'pp' },
-              grid: { color: "#2d3348" },
-            },
+            x: { ticks: { color: "#64748b", font: { size: 10 } }, grid: { color: "#1a1f2e" } },
+            y: { ticks: { color: "#64748b", callback: v => (v >= 0 ? '+' : '') + v + 'pp' }, grid: { color: "#1a1f2e" } },
           },
         },
         plugins: [{
           id: 'zeroLine',
           afterDraw(chart) {
             const { ctx, chartArea: { left, right }, scales: { y } } = chart;
-            const yPos = y.getPixelForValue(0);
+            const yp = y.getPixelForValue(0);
             ctx.save();
             ctx.beginPath();
-            ctx.moveTo(left, yPos);
-            ctx.lineTo(right, yPos);
-            ctx.strokeStyle = '#475569';
-            ctx.lineWidth = 1;
-            ctx.stroke();
+            ctx.moveTo(left, yp); ctx.lineTo(right, yp);
+            ctx.strokeStyle = '#3d4663'; ctx.lineWidth = 1; ctx.stroke();
             ctx.restore();
           },
         }],
       });
     } else {
       document.getElementById("deltaChart").closest(".card").innerHTML =
-        '<h2>30-Day Change by Service</h2><p class="empty-note">Not enough history to compute 30-day delta.</p>';
+        '<div class="card-title">30-Day Change by Service</div><p class="empty-note" style="margin-top:1rem">Not enough history yet.</p>';
     }
 
-    // ── Build table data ──
+    // ── Table data ──
     for (const repo of repos) {
       const rows = byRepo[repo];
-      const cur = rows[rows.length - 1];
+      const cur  = rows[rows.length - 1];
 
-      const sevenDaysAgo = new Date(lastDate);
-      sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
-      const isoWeekAgo = sevenDaysAgo.toISOString().slice(0, 10);
-      const older = rows.filter(r => r.date <= isoWeekAgo && r.pct !== null);
+      const sevenAgo = new Date(lastDate);
+      sevenAgo.setDate(sevenAgo.getDate() - 7);
+      const isoWeekAgo = sevenAgo.toISOString().slice(0, 10);
+      const older  = rows.filter(r => r.date <= isoWeekAgo && r.pct !== null);
       const weekRow = older.length ? older[older.length - 1] : null;
-      const delta = (cur.pct !== null && weekRow?.pct !== null && weekRow?.pct !== undefined)
+      const delta  = (cur.pct !== null && weekRow?.pct != null)
         ? cur.pct - weekRow.pct : null;
 
+      // pushed_at: use latest non-empty value
+      const pushedAt = [...rows].reverse().map(r => r.pushed_at).find(p => p) || '';
+
       tableData.push({
-        name: repo.split("/")[1],
-        pct: cur.pct,
-        date: cur.date,
+        name:      repo.split("/")[1],
+        pct:       cur.pct,
+        date:      cur.date,
         delta,
-        source: cur.source,
-        history: byRepo[repo].map(r => ({ date: r.date, pct: r.pct })),
+        source:    cur.source,
+        pushed_at: pushedAt,
+        history:   byRepo[repo].map(r => ({ date: r.date, pct: r.pct })),
       });
     }
 
-    // Default sort: coverage ascending (worst first)
-    sortCol = 'pct';
-    sortDir = 1;
     renderTable();
 
-    // ── Table sort click ──
+    // Sort/filter listeners
     document.querySelectorAll("#detail-table th[data-col]").forEach(th => {
       th.addEventListener("click", () => {
         const col = th.dataset.col;
-        if (sortCol === col) {
-          sortDir *= -1;
-        } else {
-          sortCol = col;
-          sortDir = col === 'pct' ? 1 : -1;
-        }
+        if (sortCol === col) { sortDir *= -1; }
+        else { sortCol = col; sortDir = 1; }
         renderTable();
       });
     });
 
-    // ── Filter buttons ──
     document.querySelectorAll(".filter-btn").forEach(btn => {
       btn.addEventListener("click", () => {
         document.querySelectorAll(".filter-btn").forEach(b => b.classList.remove("active"));
@@ -952,7 +1015,7 @@
   }
 
   load().catch(err => {
-    document.body.innerHTML += `<p style="color:#f87171;margin-top:2rem">Failed to load CSV: ${err.message}</p>`;
+    document.body.innerHTML += `<p style="color:var(--red);margin-top:2rem">Failed to load: ${err.message}</p>`;
   });
 </script>
 </body>

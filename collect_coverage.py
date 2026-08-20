@@ -61,7 +61,7 @@ JACOCO_REPOS = {
 
 GITHUB_API = "https://api.github.com"
 CSV_PATH = os.path.join(os.path.dirname(__file__), "coverage-history.csv")
-CSV_COLUMNS = ["date", "repo", "coverage_pct", "source"]
+CSV_COLUMNS = ["date", "repo", "coverage_pct", "source", "repo_pushed_at"]
 
 
 # ---------------------------------------------------------------------------
@@ -78,6 +78,16 @@ def github_get(path, token, binary=False):
     req = Request(url, headers=headers)
     with urlopen(req, context=ssl_context) as r:
         return r.read() if binary else json.loads(r.read())
+
+
+def fetch_repo_pushed_at(repo, token):
+    """Return the date the repo was last pushed to (YYYY-MM-DD), or empty string."""
+    try:
+        data = github_get(f"/repos/{repo}", token)
+        pushed = data.get("pushed_at", "")
+        return pushed[:10] if pushed else ""
+    except Exception:
+        return ""
 
 
 def download_artifact(url, token):
@@ -281,6 +291,7 @@ def load_csv(csv_path):
     best = {}
     with open(csv_path, newline="") as f:
         for row in csv.DictReader(f):
+            row.setdefault("repo_pushed_at", "")  # back-fill missing column
             key = (row["date"], row["repo"])
             existing = best.get(key)
             if existing is None:
@@ -349,11 +360,13 @@ def main():
             source = "unavailable"
             print("N/A")
 
+        pushed_at = fetch_repo_pushed_at(repo, token)
         rows_by_key[(today, repo)] = {
             "date": today,
             "repo": repo,
             "coverage_pct": f"{pct:.2f}" if pct is not None else "",
             "source": source,
+            "repo_pushed_at": pushed_at,
         }
         new_count += 1
 
