@@ -190,24 +190,28 @@
 
     .service-pod {
       background: var(--surface);
-      padding: 0.85rem 1rem;
+      padding: 1rem 1.1rem;
       display: flex;
       flex-direction: column;
-      gap: 0.45rem;
-      border-top: 2px solid transparent;
+      gap: 0.55rem;
+      border-top: 3px solid transparent;
       transition: background 0.1s;
       cursor: default;
     }
     .service-pod:hover { background: #22262c; }
-    .service-pod.s-green  { border-top-color: var(--green); }
-    .service-pod.s-yellow { border-top-color: var(--yellow); }
-    .service-pod.s-red    { border-top-color: var(--red); }
+    /* subtle status tints */
+    .service-pod.s-green  { border-top-color: var(--green);  background: #181e1b; }
+    .service-pod.s-green:hover  { background: #1e2620; }
+    .service-pod.s-yellow { border-top-color: var(--yellow); background: #1d1b16; }
+    .service-pod.s-yellow:hover { background: #25221b; }
+    .service-pod.s-red    { border-top-color: var(--red);    background: #1e1719; }
+    .service-pod.s-red:hover    { background: #271b1e; }
     .service-pod.s-na     { border-top-color: var(--muted2); }
 
     .pod-name {
-      font-size: 0.88rem;
+      font-size: 0.85rem;
       font-weight: 700;
-      color: var(--text);
+      color: #e8edf2;
       line-height: 1.2;
       letter-spacing: -0.01em;
     }
@@ -215,15 +219,17 @@
     .pod-main {
       display: flex;
       align-items: center;
-      gap: 0.75rem;
+      gap: 0.65rem;
     }
+    /* number is always white — color lives in the top stripe and meter */
     .pod-pct {
-      font-size: 1.65rem;
-      font-weight: 700;
-      letter-spacing: -0.03em;
+      font-size: 1.8rem;
+      font-weight: 800;
+      letter-spacing: -0.04em;
       line-height: 1;
+      color: #ffffff;
       flex-shrink: 0;
-      min-width: 3.5rem;
+      min-width: 4rem;
     }
     .pod-delta {
       display: flex;
@@ -234,37 +240,27 @@
       flex-shrink: 0;
       line-height: 1;
     }
-    .pod-delta .pd-arrow {
-      font-size: 1rem;
-      line-height: 1;
-    }
-    .pod-delta .pd-val {
-      font-size: 0.62rem;
-      font-weight: 600;
-      letter-spacing: 0.01em;
-    }
-    .pod-delta .pd-period {
-      font-size: 0.55rem;
-      font-weight: 400;
-      opacity: 0.6;
-    }
+    .pod-delta .pd-arrow { font-size: 1.1rem; line-height: 1; }
+    .pod-delta .pd-val   { font-size: 0.65rem; font-weight: 700; letter-spacing: 0.01em; }
+    .pod-delta .pd-period { font-size: 0.56rem; font-weight: 400; opacity: 0.55; }
     .pod-delta.up   { color: var(--green); }
     .pod-delta.down { color: var(--red); }
-    .pod-delta.flat { color: var(--muted2); }
-    /* sparkline — time-based trend */
+    .pod-delta.flat { color: var(--muted); }
+
+    /* sparkline — time-based trend, no fill */
     .pod-spark {
       flex: 1;
       position: relative;
-      height: 44px;
+      height: 42px;
       min-width: 0;
     }
     .pod-spark canvas { position: absolute; inset: 0; width: 100% !important; height: 100% !important; }
     .pod-spark-empty {
-      height: 44px;
+      height: 42px;
       display: flex;
       align-items: center;
       color: var(--muted2);
-      font-size: 0.7rem;
+      font-size: 0.68rem;
     }
 
     /* coverage meter — 0–100 quantity bar with target marker */
@@ -313,6 +309,9 @@
     .pod-meta-sep { color: var(--muted2); }
 
     .source-tag { font-size: 0.68rem; color: var(--muted2); }
+    .source-fresh    { font-size: 0.68rem; color: #3d7a52; }
+    .source-stale    { font-size: 0.68rem; color: var(--muted2); font-style: italic; }
+    .source-missing  { font-size: 0.68rem; color: var(--red); opacity: 0.7; }
 
     /* ── Filter row ── */
     .filter-row {
@@ -527,7 +526,7 @@
         pod.innerHTML = `
           <div class="pod-name">${r.name}</div>
           <div class="pod-main">
-            <div class="pod-pct" style="color:${color}">${r.pct !== null ? r.pct.toFixed(1) + '%' : '—'}</div>
+            <div class="pod-pct">${r.pct !== null ? r.pct.toFixed(1) + '%' : '—'}</div>
             ${r.delta !== null
               ? `<div class="pod-delta ${r.delta > 0.05 ? 'up' : r.delta < -0.05 ? 'down' : 'flat'}">
                   <span class="pd-arrow">${r.delta > 0.05 ? '↑' : r.delta < -0.05 ? '↓' : '→'}</span>
@@ -546,7 +545,7 @@
           <div class="pod-meta">
             <span>${r.date}</span>
             <span class="pod-meta-sep">·</span>
-            <span class="source-tag">${r.source}</span>
+            <span class="${r.source === 'fresh' ? 'source-fresh' : r.source === 'unavailable' ? 'source-missing' : 'source-stale'}">${r.source}</span>
             ${push ? `<span class="pod-meta-sep">·</span><span class="push-chip${push.stale ? ' stale' : ''}">${push.text}</span>` : ''}
           </div>
         `;
@@ -580,9 +579,9 @@
         data: {
           labels: r.history.map(h => h.date),
           datasets: [{ data: yValues, borderColor: color,
-            backgroundColor: color + '20', borderWidth: 1.5,
+            backgroundColor: 'transparent', borderWidth: 1.5,
             pointRadius: 0, pointHoverRadius: 4, pointHoverBackgroundColor: color,
-            spanGaps: true, tension: 0.3, fill: true }],
+            spanGaps: true, tension: 0.3, fill: false }],
         },
         options: {
           responsive: true, maintainAspectRatio: false, animation: false,
