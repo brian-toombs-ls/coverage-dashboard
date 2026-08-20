@@ -243,6 +243,11 @@
       font-weight: 600;
       letter-spacing: 0.01em;
     }
+    .pod-delta .pd-period {
+      font-size: 0.55rem;
+      font-weight: 400;
+      opacity: 0.6;
+    }
     .pod-delta.up   { color: var(--green); }
     .pod-delta.down { color: var(--red); }
     .pod-delta.flat { color: var(--muted2); }
@@ -527,6 +532,7 @@
               ? `<div class="pod-delta ${r.delta > 0.05 ? 'up' : r.delta < -0.05 ? 'down' : 'flat'}">
                   <span class="pd-arrow">${r.delta > 0.05 ? '↑' : r.delta < -0.05 ? '↓' : '→'}</span>
                   <span class="pd-val">${r.delta > 0 ? '+' : ''}${r.delta.toFixed(1)}%</span>
+                  <span class="pd-period">${r.deltaPeriod}</span>
                  </div>`
               : ''}
             ${hasHistory
@@ -733,9 +739,9 @@
 
     // ── At Risk: recently-active repos below target ──
     const atRiskList = document.getElementById('at-risk-list');
-    const weekAgo = new Date(lastDate);
-    weekAgo.setDate(weekAgo.getDate() - 7);
-    const isoWeekAgo = weekAgo.toISOString().slice(0, 10);
+    const thirtyAgo = new Date(lastDate);
+    thirtyAgo.setDate(thirtyAgo.getDate() - 30);
+    const iso30Ago = thirtyAgo.toISOString().slice(0, 10);
 
     const atRisk = repos
       .filter(r => {
@@ -777,9 +783,16 @@
       const rows = byRepo[repo];
       const cur  = rows[rows.length - 1];
 
-      const older   = rows.filter(r => r.date <= isoWeekAgo && r.pct !== null);
-      const weekRow = older.length ? older[older.length - 1] : null;
-      const delta   = cur.pct !== null && weekRow?.pct != null ? cur.pct - weekRow.pct : null;
+      const older   = rows.filter(r => r.date <= iso30Ago && r.pct !== null);
+      const baseRow = older.length ? older[older.length - 1] : null;
+      // Fall back to earliest available if less than 30 days of history
+      const refRow  = baseRow ?? (rows.filter(r => r.pct !== null)[0] ?? null);
+      const delta   = cur.pct !== null && refRow && refRow.date !== cur.date
+        ? cur.pct - refRow.pct : null;
+      const deltaDays = delta !== null
+        ? Math.round((new Date(cur.date) - new Date(refRow.date)) / 86400000) : null;
+      const deltaPeriod = deltaDays !== null
+        ? (deltaDays >= 28 ? '30d' : deltaDays >= 13 ? '2w' : `${deltaDays}d`) : '';
       const pushedAt = [...rows].reverse().map(r => r.pushed_at).find(p => p) || '';
 
       podData.push({
@@ -787,6 +800,7 @@
         pct:       cur.pct,
         date:      cur.date,
         delta,
+        deltaPeriod,
         source:    cur.source,
         pushed_at: pushedAt,
         history:   rows.map(r => ({ date: r.date, pct: r.pct })),
