@@ -199,13 +199,9 @@
       cursor: default;
     }
     .service-pod:hover { background: #22262c; }
-    /* subtle status tints */
-    .service-pod.s-green  { border-top-color: var(--green);  background: #181e1b; }
-    .service-pod.s-green:hover  { background: #1e2620; }
-    .service-pod.s-yellow { border-top-color: var(--yellow); background: #1d1b16; }
-    .service-pod.s-yellow:hover { background: #25221b; }
-    .service-pod.s-red    { border-top-color: var(--red);    background: #1e1719; }
-    .service-pod.s-red:hover    { background: #271b1e; }
+    .service-pod.s-green  { border-top-color: var(--green); }
+    .service-pod.s-yellow { border-top-color: var(--yellow); }
+    .service-pod.s-red    { border-top-color: var(--red); }
     .service-pod.s-na     { border-top-color: var(--muted2); }
 
     .pod-name {
@@ -243,9 +239,9 @@
     .pod-delta .pd-arrow { font-size: 1.1rem; line-height: 1; }
     .pod-delta .pd-val   { font-size: 0.65rem; font-weight: 700; letter-spacing: 0.01em; }
     .pod-delta .pd-period { font-size: 0.56rem; font-weight: 400; opacity: 0.55; }
-    .pod-delta.up   { color: var(--green); }
-    .pod-delta.down { color: var(--red); }
-    .pod-delta.flat { color: var(--muted); }
+    .pod-delta.up   { color: #73bf69; }
+    .pod-delta.down { color: #e05263; }
+    .pod-delta.flat { color: var(--muted2); }
 
     /* sparkline — time-based trend, no fill */
     .pod-spark {
@@ -539,7 +535,7 @@
               : `<div class="pod-spark-empty">no history yet</div>`}
           </div>
           <div class="pod-meter">
-            <div class="pod-meter-fill" style="width:${Math.min(100, r.pct ?? 0)}%;background:${color}"></div>
+            <div class="pod-meter-fill" style="width:${Math.min(100, r.pct ?? 0)}%;background:${color};opacity:0.55"></div>
             <div class="pod-meter-target"></div>
           </div>
           <div class="pod-meta">
@@ -578,9 +574,9 @@
         type: 'line',
         data: {
           labels: r.history.map(h => h.date),
-          datasets: [{ data: yValues, borderColor: color,
+          datasets: [{ data: yValues, borderColor: '#5d6470',
             backgroundColor: 'transparent', borderWidth: 1.5,
-            pointRadius: 0, pointHoverRadius: 4, pointHoverBackgroundColor: color,
+            pointRadius: 0, pointHoverRadius: 4, pointHoverBackgroundColor: '#8d9099',
             spanGaps: true, tension: 0.3, fill: false }],
         },
         options: {
