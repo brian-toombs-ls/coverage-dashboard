@@ -10,21 +10,61 @@
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
-      --bg:       #111217;
-      --surface:  #181b1f;
-      --surface2: #1e2125;
-      --border:   #2c3036;
-      --border2:  #3a3f47;
-      --text:     #d9dde3;
-      --muted:    #8d9099;
-      --muted2:   #4d535c;
-      --accent:   #5794f2;
-      --green:    #6ccf8e;
-      --green-bg: #1a2e22;
-      --yellow:   #f5a623;
-      --yellow-bg:#2e2516;
-      --red:      #f2495c;
-      --red-bg:   #2e1520;
+      --bg:        #111217;
+      --surface:   #181b1f;
+      --surface2:  #1e2125;
+      --border:    #2c3036;
+      --border2:   #3a3f47;
+      --text:      #d9dde3;
+      --muted:     #8d9099;
+      --muted2:    #4d535c;
+      --accent:    #5794f2;
+      --green:     #6ccf8e;
+      --green-bg:  #1a2e22;
+      --yellow:    #f5a623;
+      --yellow-bg: #2e2516;
+      --red:       #f2495c;
+      --red-bg:    #2e1520;
+      /* theme-specific */
+      --pod-num:       #ffffff;
+      --pod-hover:     #22262c;
+      --row-hover:     #22262c;
+      --spark-line:    #5d6470;
+      --chart-grid:    #22262b;
+      --chart-tick:    #8d9099;
+      --tip-bg:        #1e2125;
+      --tip-border:    #2c3036;
+      --tip-title:     #8d9099;
+      --tip-body:      #d9dde3;
+    }
+
+    [data-theme="light"] {
+      --bg:        #f0f2f5;
+      --surface:   #ffffff;
+      --surface2:  #f4f5f7;
+      --border:    #dde1e7;
+      --border2:   #b8bec9;
+      --text:      #1a1d23;
+      --muted:     #5c6370;
+      --muted2:    #9ca3af;
+      --accent:    #2563eb;
+      --green:     #16a34a;
+      --green-bg:  #dcfce7;
+      --yellow:    #d97706;
+      --yellow-bg: #fef3c7;
+      --red:       #dc2626;
+      --red-bg:    #fee2e2;
+      /* theme-specific */
+      --pod-num:       #111217;
+      --pod-hover:     #f0f2f5;
+      --row-hover:     #f4f5f7;
+      --spark-line:    #94a3b8;
+      --chart-grid:    #e5e7eb;
+      --chart-tick:    #6b7280;
+      --tip-bg:        #ffffff;
+      --tip-border:    #dde1e7;
+      --tip-title:     #6b7280;
+      --tip-body:      #1a1d23;
     }
 
     body {
@@ -86,6 +126,23 @@
     .copy-btn:hover { background: #4a84e8; }
     .copy-btn.copied { background: #3a7d5c; }
 
+    .theme-btn {
+      background: transparent;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      color: var(--muted);
+      font-size: 0.9rem;
+      width: 2rem;
+      height: 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: border-color 0.1s, color 0.1s;
+      line-height: 1;
+    }
+    .theme-btn:hover { border-color: var(--border2); color: var(--text); }
+
     /* ── KPI Row ── */
     .kpi-row {
       display: grid;
@@ -102,7 +159,7 @@
       padding: 1.25rem 1.5rem;
       transition: border-color 0.1s;
     }
-    .stat-card:hover { border-color: var(--border2); background: #1d2125; }
+    .stat-card:hover { border-color: var(--border2); background: var(--surface2); }
 
     .stat-label {
       font-size: 0.7rem;
@@ -198,7 +255,7 @@
       transition: background 0.1s;
       cursor: default;
     }
-    .service-pod:hover { background: #22262c; }
+    .service-pod:hover { background: var(--pod-hover); }
     .service-pod.s-green  { border-top-color: var(--green); }
     .service-pod.s-yellow { border-top-color: var(--yellow); }
     .service-pod.s-red    { border-top-color: var(--red); }
@@ -207,7 +264,7 @@
     .pod-name {
       font-size: 0.85rem;
       font-weight: 700;
-      color: #e8edf2;
+      color: var(--text);
       line-height: 1.2;
       letter-spacing: -0.01em;
     }
@@ -223,7 +280,7 @@
       font-weight: 800;
       letter-spacing: -0.04em;
       line-height: 1;
-      color: #ffffff;
+      color: var(--pod-num);
       flex-shrink: 0;
       min-width: 4rem;
     }
@@ -370,7 +427,7 @@
       transition: background 0.1s;
       cursor: default;
     }
-    .insight-row:hover { background: #22262c; }
+    .insight-row:hover { background: var(--row-hover); }
     .insight-name { font-size: 0.8rem; font-weight: 500; color: var(--text); }
     .insight-detail { font-size: 0.72rem; color: var(--muted); }
     .insight-pct { font-size: 0.85rem; font-weight: 700; }
@@ -386,6 +443,9 @@
   </div>
   <div class="header-right">
     <div class="meta" id="meta">Loading…</div>
+    <button class="theme-btn" id="themeBtn" onclick="toggleTheme()" title="Toggle light/dark mode">
+      <span id="themeIcon">☀</span>
+    </button>
     <button class="copy-btn" id="copyBtn" onclick="copyCoverage()">
       <svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
         <rect x="5" y="5" width="9" height="9" rx="1.5"/><path d="M11 5V3.5A1.5 1.5 0 0 0 9.5 2h-6A1.5 1.5 0 0 0 2 3.5v6A1.5 1.5 0 0 0 3.5 11H5"/>
@@ -430,6 +490,23 @@
   const CSV_URL    = "./coverage-history.csv";
   const TARGET     = 80;
   const STALE_DAYS = 30;
+
+  // ── Theme ─────────────────────────────────────────────────────────────────
+  function applyTheme(theme) {
+    document.documentElement.dataset.theme = theme;
+    document.getElementById('themeIcon').textContent = theme === 'light' ? '☾' : '☀';
+    localStorage.setItem('theme', theme);
+  }
+  function toggleTheme() {
+    const next = document.documentElement.dataset.theme === 'light' ? 'dark' : 'light';
+    applyTheme(next);
+    renderPods(); // rebuild sparklines with correct colors
+  }
+  applyTheme(localStorage.getItem('theme') || 'dark');
+
+  function cssVar(name) {
+    return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+  }
 
   // ── Helpers ──────────────────────────────────────────────────────────────
 
@@ -574,9 +651,11 @@
         type: 'line',
         data: {
           labels: r.history.map(h => h.date),
-          datasets: [{ data: yValues, borderColor: '#5d6470',
+          datasets: [{ data: yValues,
+            borderColor: cssVar('--spark-line'),
             backgroundColor: 'transparent', borderWidth: 1.5,
-            pointRadius: 0, pointHoverRadius: 4, pointHoverBackgroundColor: '#8d9099',
+            pointRadius: 0, pointHoverRadius: 4,
+            pointHoverBackgroundColor: cssVar('--spark-line'),
             spanGaps: true, tension: 0.3, fill: false }],
         },
         options: {
@@ -586,11 +665,11 @@
             legend: { display: false },
             tooltip: {
               enabled: true,
-              backgroundColor: '#1e2125',
-              borderColor: '#2c3036',
+              backgroundColor: cssVar('--tip-bg'),
+              borderColor: cssVar('--tip-border'),
               borderWidth: 1,
-              titleColor: '#8d9099',
-              bodyColor: '#d9dde3',
+              titleColor: cssVar('--tip-title'),
+              bodyColor: cssVar('--tip-body'),
               titleFont: { size: 10 },
               bodyFont: { size: 11, weight: 'bold' },
               padding: 6,
