@@ -306,7 +306,7 @@ def fetch_coverage(repo, token):
     page = 1
     while page <= 10:
         try:
-            data = github_get(f"/repos/{repo}/actions/runs?status=success&per_page=10&page={page}{branch_q}", token)
+            data = github_get(f"/repos/{repo}/actions/runs?per_page=10&page={page}{branch_q}", token)
         except Exception as e:
             print(f"  API error: {e}")
             return None
@@ -315,7 +315,14 @@ def fetch_coverage(repo, token):
         if not runs:
             break
 
+        # status=success is deliberately absent: passing it returns runs out of
+        # chronological order, so the newest run holding an artifact can sit
+        # beyond the ten pages walked here and never be seen. Unfiltered runs
+        # come back newest-first, so success is checked per run instead.
         for run in runs:
+            if run.get("conclusion") != "success":
+                continue
+
             if multi:
                 pct = combined_coverage_from_run(repo, run["id"], token, multi)
                 if pct is not None:
