@@ -43,6 +43,8 @@ REPOSITORIES = [
     "LegalSifter/workflows",
     "LegalSifter/ls-review-fe",
     "LegalSifter/control-bff",
+    "LegalSifter/ReviewPro-GoogleDocsAddIn",
+    "LegalSifter/reviewpro-onlyoffice",
 ]
 
 # Repos that produce coverage-summary.json (Istanbul/Vitest json-summary reporter)
@@ -50,6 +52,23 @@ REPOSITORIES = [
 ISTANBUL_REPOS = {
     "LegalSifter/ls-review-fe",
     "LegalSifter/control-bff",
+    "LegalSifter/ReviewPro-GoogleDocsAddIn",
+    "LegalSifter/reviewpro-onlyoffice",
+}
+
+# Repos that split coverage across several artifacts in one run. Every listed
+# artifact must be present or the run is skipped — half a codebase is not a
+# coverage number. Totals are combined line-weighted, not averaged, so a small
+# surface cannot outweigh a large one.
+MULTI_ARTIFACT_REPOS = {
+    "LegalSifter/ReviewPro-GoogleDocsAddIn": ("server-coverage", "client-coverage"),
+}
+
+# Repos where only default-branch runs count. Without this the collector can
+# pick up a feature branch's coverage and report it as the repo's.
+DEFAULT_BRANCH = {
+    "LegalSifter/ReviewPro-GoogleDocsAddIn": "develop",
+    "LegalSifter/reviewpro-onlyoffice": "develop",
 }
 
 JACOCO_REPOS = {
@@ -139,6 +158,16 @@ def extract_istanbul_json(json_bytes):
         return None
 
 
+def istanbul_line_counts(json_bytes):
+    """Return (covered, total) line counts from an Istanbul coverage-summary.json.
+    Raw counts rather than a percentage so several reports can be combined."""
+    try:
+        lines = json.loads(json_bytes)["total"]["lines"]
+        return int(lines["covered"]), int(lines["total"])
+    except Exception:
+        return None
+
+
 def extract_gocov(html):
     patterns = [
         r'<div\s+id=["\']totalcov["\'][^>]*>\s*(\d+(?:\.\d+)?)\s*%\s*</div>',
@@ -214,6 +243,43 @@ def coverage_from_zip(zip_bytes, repo):
     return None
 
 
+def combined_coverage_from_run(repo, run_id, token, artifact_names):
+    """Line-weighted coverage across a run's several coverage artifacts.
+    Returns None unless every named artifact is present and parses."""
+    try:
+        art_data = github_get(f"/repos/{repo}/actions/runs/{run_id}/artifacts", token)
+    except Exception:
+        return None
+
+    by_name = {a.get("name"): a for a in art_data.get("artifacts", [])}
+    covered = total = 0
+
+    for name in artifact_names:
+        artifact = by_name.get(name)
+        if artifact is None:
+            return None
+
+        try:
+            zip_bytes = download_artifact(artifact["archive_download_url"], token)
+        except Exception:
+            return None
+
+        counts = None
+        with zipfile.ZipFile(io.BytesIO(zip_bytes)) as zf:
+            for entry in zf.namelist():
+                if entry.endswith("coverage-summary.json"):
+                    counts = istanbul_line_counts(zf.read(entry))
+                    if counts:
+                        break
+        if not counts:
+            return None
+
+        covered += counts[0]
+        total += counts[1]
+
+    return round(100.0 * covered / total, 2) if total else None
+
+
 def find_coverage_artifact(artifacts):
     for a in artifacts:
         name = a.get("name", "").lower()
@@ -233,10 +299,14 @@ def find_coverage_artifact(artifacts):
 # ---------------------------------------------------------------------------
 
 def fetch_coverage(repo, token):
+    multi = MULTI_ARTIFACT_REPOS.get(repo)
+    branch = DEFAULT_BRANCH.get(repo)
+    branch_q = f"&branch={branch}" if branch else ""
+
     page = 1
     while page <= 10:
         try:
-            data = github_get(f"/repos/{repo}/actions/runs?status=success&per_page=10&page={page}", token)
+            data = github_get(f"/repos/{repo}/actions/runs?status=success&per_page=10&page={page}{branch_q}", token)
         except Exception as e:
             print(f"  API error: {e}")
             return None
@@ -246,6 +316,12 @@ def fetch_coverage(repo, token):
             break
 
         for run in runs:
+            if multi:
+                pct = combined_coverage_from_run(repo, run["id"], token, multi)
+                if pct is not None:
+                    return pct
+                continue
+
             try:
                 art_data = github_get(f"/repos/{repo}/actions/runs/{run['id']}/artifacts", token)
             except Exception:
