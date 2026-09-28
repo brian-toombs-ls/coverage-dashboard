@@ -912,7 +912,7 @@ date,repo,coverage_pct,source,repo_pushed_at
 2026-09-27,LegalSifter/ms-sign,85.10,carried_forward,2026-09-02
 2026-09-27,LegalSifter/ms-storage,99.00,fresh,2026-09-21
 2026-09-27,LegalSifter/workflows,80.60,carried_forward,2026-09-02
-2026-09-28,LegalSifter/ReviewPro-GoogleDocsAddIn,,unavailable,2026-09-13
+2026-09-28,LegalSifter/ReviewPro-GoogleDocsAddIn,90.46,fresh,2026-09-13
 2026-09-28,LegalSifter/api-documents,80.40,carried_forward,2026-09-17
 2026-09-28,LegalSifter/api-settings,,unavailable,2026-09-22
 2026-09-28,LegalSifter/api-tickets,80.50,carried_forward,2026-09-02
