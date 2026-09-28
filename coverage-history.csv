@@ -931,5 +931,5 @@ date,repo,coverage_pct,source,repo_pushed_at
 2026-09-28,LegalSifter/ms-share,96.50,carried_forward,2026-09-02
 2026-09-28,LegalSifter/ms-sign,85.10,carried_forward,2026-09-02
 2026-09-28,LegalSifter/ms-storage,99.00,carried_forward,2026-09-21
-2026-09-28,LegalSifter/reviewpro-onlyoffice,,unavailable,2026-09-28
+2026-09-28,LegalSifter/reviewpro-onlyoffice,82.18,fresh,2026-09-28
 2026-09-28,LegalSifter/workflows,80.60,carried_forward,2026-09-02
