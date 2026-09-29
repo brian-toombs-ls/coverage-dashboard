@@ -64,13 +64,6 @@ MULTI_ARTIFACT_REPOS = {
     "LegalSifter/ReviewPro-GoogleDocsAddIn": ("server-coverage", "client-coverage"),
 }
 
-# Repos where only default-branch runs count. Without this the collector can
-# pick up a feature branch's coverage and report it as the repo's.
-DEFAULT_BRANCH = {
-    "LegalSifter/ReviewPro-GoogleDocsAddIn": "develop",
-    "LegalSifter/reviewpro-onlyoffice": "develop",
-}
-
 JACOCO_REPOS = {
     "LegalSifter/ms-auth",
     "LegalSifter/ms-profile",
@@ -80,7 +73,7 @@ JACOCO_REPOS = {
 
 GITHUB_API = "https://api.github.com"
 CSV_PATH = os.path.join(os.path.dirname(__file__), "coverage-history.csv")
-CSV_COLUMNS = ["date", "repo", "coverage_pct", "source", "repo_pushed_at"]
+CSV_COLUMNS = ["date", "repo", "coverage_pct", "source", "repo_pushed_at", "measured_on", "measured_branch"]
 
 
 # ---------------------------------------------------------------------------
@@ -99,14 +92,14 @@ def github_get(path, token, binary=False):
         return r.read() if binary else json.loads(r.read())
 
 
-def fetch_repo_pushed_at(repo, token):
-    """Return the date the repo was last pushed to (YYYY-MM-DD), or empty string."""
+def fetch_repo_meta(repo, token):
+    """Return (last push date as YYYY-MM-DD, default branch). Either may be empty."""
     try:
         data = github_get(f"/repos/{repo}", token)
-        pushed = data.get("pushed_at", "")
-        return pushed[:10] if pushed else ""
+        pushed = data.get("pushed_at", "") or ""
+        return pushed[:10], data.get("default_branch", "") or ""
     except Exception:
-        return ""
+        return "", ""
 
 
 def download_artifact(url, token):
@@ -280,14 +273,27 @@ def combined_coverage_from_run(repo, run_id, token, artifact_names):
     return round(100.0 * covered / total, 2) if total else None
 
 
+# Artifacts whose names match the fallback patterns but hold no coverage data.
+# "GoSec Report" matched on "report" and was downloaded on every ms-billing
+# collection; it parsed to nothing, but a template that rendered any percentage
+# would have been recorded as coverage.
+NON_COVERAGE_ARTIFACTS = ("gosec", "sigrid", "playwright", "e2e", "dockerbuild")
+
+
 def find_coverage_artifact(artifacts):
-    for a in artifacts:
+    def usable(a):
+        name = a.get("name", "").lower()
+        return not any(bad in name for bad in NON_COVERAGE_ARTIFACTS)
+
+    candidates = [a for a in artifacts if usable(a)]
+
+    for a in candidates:
         name = a.get("name", "").lower()
         if "unit" in name and ("test" in name or "report" in name or "coverage" in name):
             return a
         if "coverage" in name:
             return a
-    for a in artifacts:
+    for a in candidates:
         name = a.get("name", "").lower()
         if "test" in name or "report" in name:
             return a
@@ -298,9 +304,26 @@ def find_coverage_artifact(artifacts):
 # Per-repo fetching (walks back through runs until a live artifact is found)
 # ---------------------------------------------------------------------------
 
-def fetch_coverage(repo, token):
+def fetch_coverage(repo, token, branch=""):
+    """Collect coverage from the newest run carrying an artifact.
+
+    The default branch is tried first, then any branch. A feature branch runs
+    the same suite, so its number is a real measurement — just of unmerged
+    code, which reads high when the branch is what added the tests. A same-day
+    branch run still beats a three-week-old default-branch one, so the branch
+    is recorded rather than the value discarded.
+    """
+    if branch:
+        found = _coverage_from_runs(repo, token, branch)
+        if found is not None:
+            return found + (branch,)
+
+    found = _coverage_from_runs(repo, token, "")
+    return (found + ("any",)) if found is not None else None
+
+
+def _coverage_from_runs(repo, token, branch):
     multi = MULTI_ARTIFACT_REPOS.get(repo)
-    branch = DEFAULT_BRANCH.get(repo)
     branch_q = f"&branch={branch}" if branch else ""
 
     page = 1
@@ -323,10 +346,12 @@ def fetch_coverage(repo, token):
             if run.get("conclusion") != "success":
                 continue
 
+            measured_on = (run.get("created_at") or "")[:10]
+
             if multi:
                 pct = combined_coverage_from_run(repo, run["id"], token, multi)
                 if pct is not None:
-                    return pct
+                    return pct, measured_on
                 continue
 
             try:
@@ -346,7 +371,7 @@ def fetch_coverage(repo, token):
                 zip_bytes = download_artifact(artifact["archive_download_url"], token)
                 pct = coverage_from_zip(zip_bytes, repo)
                 if pct is not None:
-                    return pct
+                    return pct, measured_on
             except Exception as e:
                 if "410" in str(e) or "status 410" in str(e):
                     continue
@@ -362,7 +387,7 @@ def fetch_coverage(repo, token):
 # CSV helpers
 # ---------------------------------------------------------------------------
 
-SOURCE_RANK = {"fresh": 0, "carried_forward": 1, "unavailable": 2, "": 3}
+SOURCE_RANK = {"fresh": 0, "carried_forward": 1, "stale": 2, "unavailable": 3, "": 4}
 
 
 def load_csv(csv_path):
@@ -374,7 +399,9 @@ def load_csv(csv_path):
     best = {}
     with open(csv_path, newline="") as f:
         for row in csv.DictReader(f):
-            row.setdefault("repo_pushed_at", "")  # back-fill missing column
+            row.setdefault("repo_pushed_at", "")  # back-fill missing columns
+            row.setdefault("measured_on", "")
+            row.setdefault("measured_branch", "")
             key = (row["date"], row["repo"])
             existing = best.get(key)
             if existing is None:
@@ -409,11 +436,23 @@ def main():
     # Load and deduplicate existing history
     rows_by_key = load_csv(CSV_PATH)
 
-    # Derive last known values from historical fresh/carried_forward entries
+    # Derive last known values, keeping the date each was actually measured so
+    # a carried-forward value can be judged against later commits.
+    # Anchored to the last row that came from a real artifact. A carried-forward
+    # row's own date is the day it was copied, not the day it was measured, so
+    # using it would keep resetting the clock and the value could never age.
     last_known = {}
-    for (d, repo), row in rows_by_key.items():
-        if row.get("coverage_pct") not in ("", None):
-            last_known[repo] = float(row["coverage_pct"])
+    for (d, repo), row in sorted(rows_by_key.items()):
+        if row.get("coverage_pct") in ("", None):
+            continue
+        if row.get("source") == "fresh":
+            last_known[repo] = (float(row["coverage_pct"]), row.get("measured_on", "") or d,
+                                row.get("measured_branch", ""))
+        elif repo not in last_known:
+            # No fresh row on record; carry the value with whatever measurement
+            # date it has, and treat a missing one as unknown rather than today.
+            last_known[repo] = (float(row["coverage_pct"]), row.get("measured_on", ""),
+                                row.get("measured_branch", ""))
 
     # Which repos already have a fresh entry for today — skip them on re-run
     already_fresh = {
@@ -430,26 +469,39 @@ def main():
             continue
 
         print(f"  {short}... ", end="", flush=True)
-        pct = fetch_coverage(repo, token)
+        pushed_at, default_branch = fetch_repo_meta(repo, token)
+        result = fetch_coverage(repo, token, default_branch)
 
-        if pct is not None:
+        if result is not None:
+            pct, measured_on, measured_branch = result
             source = "fresh"
-            print(f"{pct:.1f}%")
+            note = "" if measured_branch == default_branch else f" [{measured_branch}]"
+            print(f"{pct:.1f}%{note}")
         elif repo in last_known:
-            pct = last_known[repo]
-            source = "carried_forward"
-            print(f"{pct:.1f}% (carried forward)")
+            pct, measured_on, measured_branch = last_known[repo]
+            # A value measured after the last push still describes the current
+            # code: nothing has landed that could have moved it. Once a push
+            # lands the value describes code that no longer exists, so it is
+            # carried but marked, not presented as a measurement.
+            if measured_on and pushed_at and pushed_at > measured_on:
+                source = "stale"
+                print(f"{pct:.1f}% (stale — pushed {pushed_at}, measured {measured_on})")
+            else:
+                source = "carried_forward"
+                print(f"{pct:.1f}% (carried forward, measured {measured_on or 'unknown'})")
         else:
+            pct, measured_on, measured_branch = None, "", ""
             source = "unavailable"
             print("N/A")
 
-        pushed_at = fetch_repo_pushed_at(repo, token)
         rows_by_key[(today, repo)] = {
             "date": today,
             "repo": repo,
             "coverage_pct": f"{pct:.2f}" if pct is not None else "",
             "source": source,
             "repo_pushed_at": pushed_at,
+            "measured_on": measured_on,
+            "measured_branch": measured_branch,
         }
         new_count += 1
 
