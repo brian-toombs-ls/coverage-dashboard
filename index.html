@@ -1,901 +1,1002 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>LegalSifter Coverage</title>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
-  <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>LegalSifter Coverage</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;500;600;700&display=swap" />
+<style>
+/* ==========================================================================
+   Tokens — LegalSifter ReviewPro design system (colors_and_type.css subset)
+   ========================================================================== */
+:root {
+  /* Brand */
+  --ls-purple: #6638B6;
+  --ls-orange: #ED6E24;
+  --ls-green:  #009A44;
+  --ls-deep-blue: #0057B7;
 
-    :root {
-      --bg:        #111217;
-      --surface:   #181b1f;
-      --surface2:  #1e2125;
-      --border:    #2c3036;
-      --border2:   #3a3f47;
-      --text:      #d9dde3;
-      --muted:     #8d9099;
-      --muted2:    #4d535c;
-      --accent:    #5794f2;
-      --green:     #6ccf8e;
-      --green-bg:  #1a2e22;
-      --yellow:    #f5a623;
-      --yellow-bg: #2e2516;
-      --red:       #f2495c;
-      --red-bg:    #2e1520;
-      /* theme-specific */
-      --pod-num:       #ffffff;
-      --pod-hover:     #22262c;
-      --row-hover:     #22262c;
-      --spark-line:    #5d6470;
-      --chart-grid:    #22262b;
-      --chart-tick:    #8d9099;
-      --tip-bg:        #1e2125;
-      --tip-border:    #2c3036;
-      --tip-title:     #8d9099;
-      --tip-body:      #d9dde3;
-    }
+  /* CTA / action */
+  --primary:       #0061A8;
+  --primary-hover: #004A82;
+  --link:          #0353A8;
+  --brand-red:     #B5382A;
 
-    [data-theme="light"] {
-      --bg:        #f0f2f5;
-      --surface:   #ffffff;
-      --surface2:  #f4f5f7;
-      --border:    #dde1e7;
-      --border2:   #b8bec9;
-      --text:      #1a1d23;
-      --muted:     #5c6370;
-      --muted2:    #9ca3af;
-      --accent:    #2563eb;
-      --green:     #16a34a;
-      --green-bg:  #dcfce7;
-      --yellow:    #d97706;
-      --yellow-bg: #fef3c7;
-      --red:       #dc2626;
-      --red-bg:    #fee2e2;
-      /* theme-specific */
-      --pod-num:       #111217;
-      --pod-hover:     #f0f2f5;
-      --row-hover:     #f4f5f7;
-      --spark-line:    #94a3b8;
-      --chart-grid:    #e5e7eb;
-      --chart-tick:    #6b7280;
-      --tip-bg:        #ffffff;
-      --tip-border:    #dde1e7;
-      --tip-title:     #6b7280;
-      --tip-body:      #1a1d23;
-    }
+  /* Surfaces */
+  --bg:            #FAFAF7;
+  --warm-white:    #F2F0EB;
+  --warm-gray-1:   #D5D3CE;
+  --accent:        #E7DFD7;
+  --widget:        #FFFFFF;
+  --widget-border: #F6F3F0;
+  --border:        #E5E7EB;
 
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", Roboto, sans-serif;
-      background: var(--bg);
-      color: var(--text);
-      min-height: 100vh;
-      padding: 2rem;
-    }
+  /* Foreground */
+  --fg:         #45403A;
+  --fg-light:   #595959;
+  --fg-lighter: #767676;
+  --fg-strong:  #25334A;
+  --fg-on-dark: #FFFFFF;
 
-    /* ── Header ── */
-    header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 2rem;
-      flex-wrap: wrap;
-      gap: 1rem;
-      padding-bottom: 1.25rem;
-      border-bottom: 1px solid var(--border);
-    }
+  /* Neutral ramp */
+  --gray-200: #F2F2F2;
+  --gray-300: #E0E0E0;
+  --gray-400: #C7C7C7;
+  --gray-500: #A3A3A3;
 
-    .logo-area h1 {
-      font-size: 1.05rem;
-      font-weight: 600;
-      color: var(--text);
-      letter-spacing: -0.01em;
-    }
-    .logo-area .subtitle {
-      font-size: 0.78rem;
-      color: var(--muted);
-      margin-top: 0.15rem;
-    }
+  /* Status */
+  --status-success: #51AF46;
+  --status-warning: #F59E0B;
+  --status-error:   #D32F2F;
+  --action-add-comment: #8C2C16;
 
-    .header-right {
-      display: flex;
-      align-items: center;
-      gap: 0.75rem;
-      flex-wrap: wrap;
-    }
+  /* Typography */
+  --font-sans: 'Open Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --fw-light: 300;
+  --fw-medium: 500;
+  --fw-semibold: 600;
+  --fw-bold: 700;
 
-    .meta { font-size: 0.75rem; color: var(--muted); }
+  /* Radii */
+  --radius-md: 6px;
+  --radius-lg: 8px;
+  --radius-xl: 12px;
+  --radius-pill: 9999px;
 
-    /* ── Copy button ── */
-    .copy-btn {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.4em;
-      background: var(--accent);
-      border: none;
-      border-radius: 4px;
-      color: #fff;
-      font-size: 0.8rem;
-      font-weight: 500;
-      padding: 0.45rem 1rem;
-      cursor: pointer;
-      transition: background 0.15s;
-    }
-    .copy-btn:hover { background: #4a84e8; }
-    .copy-btn.copied { background: #3a7d5c; }
+  /* Layout */
+  --header-height: 64px;
 
-    .theme-btn {
-      background: transparent;
-      border: 1px solid var(--border);
-      border-radius: 4px;
-      color: var(--muted);
-      font-size: 0.9rem;
-      width: 2rem;
-      height: 2rem;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      transition: border-color 0.1s, color 0.1s;
-      line-height: 1;
-    }
-    .theme-btn:hover { border-color: var(--border2); color: var(--text); }
+  /* Dashboard-local shades with no design-system token */
+  --error-bg:        #FDECEA;
+  --filter-on-bg:    #E8F1F8;
+  --spark-axis-text: #C0BDB7;
+  --spark-axis-rule: #E8E5E0;
+}
 
-    /* ── KPI Row ── */
-    .kpi-row {
-      display: grid;
-      grid-template-columns: 2fr 1fr 1fr 1fr 1fr;
-      gap: 1rem;
-      margin-bottom: 1.5rem;
-    }
-    @media (max-width: 1000px) { .kpi-row { grid-template-columns: 1fr 1fr; } }
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+[hidden] { display: none !important; }
 
-    .stat-card {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 6px;
-      padding: 1.25rem 1.5rem;
-      transition: border-color 0.1s;
-    }
-    .stat-card:hover { border-color: var(--border2); background: var(--surface2); }
+body {
+  font-family: var(--font-sans);
+  background: var(--bg);
+  color: var(--fg);
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
 
-    .stat-label {
-      font-size: 0.7rem;
-      color: var(--muted);
-      text-transform: uppercase;
-      letter-spacing: 0.06em;
-      font-weight: 500;
-    }
-    .stat-value {
-      font-size: 2rem;
-      font-weight: 700;
-      margin-top: 0.35rem;
-      line-height: 1;
-      letter-spacing: -0.02em;
-    }
-    .stat-card.hero .stat-value { font-size: 2.6rem; }
-    .stat-sub {
-      font-size: 0.7rem;
-      color: var(--muted);
-      margin-top: 0.4rem;
-    }
+a { color: var(--link); text-decoration: none; }
+a:hover { color: var(--primary-hover); text-decoration: underline; }
 
-    /* ── Cards ── */
-    .card {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 6px;
-      padding: 1.25rem 1.4rem;
-      transition: border-color 0.1s, background 0.1s;
-    }
+:focus-visible { outline: 2px solid var(--ls-deep-blue); outline-offset: 2px; }
 
-    .card-title {
-      font-size: 0.72rem;
-      font-weight: 600;
-      color: var(--muted);
-      text-transform: uppercase;
-      letter-spacing: 0.06em;
-      margin-bottom: 1rem;
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-    }
-    .card-title-note {
-      color: var(--muted2);
-      font-weight: 400;
-      font-size: 0.68rem;
-      letter-spacing: 0.03em;
-    }
+/* ── Header ── */
+.app-header {
+  height: var(--header-height);
+  background: var(--warm-white);
+  border-bottom: 1px solid var(--warm-gray-1);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 0 32px;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+.brand { display: flex; align-items: center; gap: 14px; min-width: 0; }
+.brand-mark { flex-shrink: 0; }
+.brand-text { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.brand-title {
+  font-size: 16px;
+  font-weight: var(--fw-semibold);
+  color: var(--fg-strong);
+  letter-spacing: -0.01em;
+  line-height: 1.2;
+}
+.brand-sub { font-size: 12px; color: var(--fg-lighter); line-height: 1.2; }
 
+.header-actions { display: flex; align-items: center; gap: 16px; }
+.meta { font-size: 12px; color: var(--fg-light); white-space: nowrap; }
 
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  background: var(--primary);
+  border: none;
+  border-radius: var(--radius-md);
+  color: var(--fg-on-dark);
+  font-family: var(--font-sans);
+  font-size: 13px;
+  font-weight: var(--fw-semibold);
+  padding: 9px 16px;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.btn-primary:hover { background: var(--primary-hover); }
 
-    /* ── Service pod grid ── */
-    .group-label {
-      font-size: 0.66rem;
-      font-weight: 600;
-      color: var(--muted);
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      padding: 0.75rem 0 0.4rem;
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-    }
-    .group-label:first-child { padding-top: 0; }
-    .group-label .gl-count {
-      background: var(--surface2);
-      border: 1px solid var(--border);
-      border-radius: 3px;
-      padding: 0 0.35rem;
-      font-size: 0.62rem;
-      color: var(--muted2);
-    }
+/* ── Layout ── */
+main {
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: 28px 32px 56px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
 
-    .service-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
-      gap: 1px;
-      background: var(--border);
-      border: 1px solid var(--border);
-      border-radius: 4px;
-      overflow: hidden;
-      margin-bottom: 1rem;
-    }
-    .service-grid:last-child { margin-bottom: 0; }
+.card {
+  background: var(--widget);
+  border: 1px solid var(--warm-white);
+  border-radius: var(--radius-lg);
+  padding: 18px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
 
-    .service-pod {
-      background: var(--surface);
-      padding: 1rem 1.1rem;
-      display: flex;
-      flex-direction: column;
-      gap: 0.55rem;
-      border-top: 3px solid transparent;
-      transition: background 0.1s;
-      cursor: default;
-    }
-    .service-pod:hover { background: var(--pod-hover); }
-    .service-pod.s-green  { border-top-color: var(--green); }
-    .service-pod.s-yellow { border-top-color: var(--yellow); }
-    .service-pod.s-red    { border-top-color: var(--red); }
-    .service-pod.s-na     { border-top-color: var(--muted2); }
+.eyebrow {
+  font-size: 10px;
+  font-weight: var(--fw-bold);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--fg-lighter);
+}
+.count { font-size: 11px; color: var(--gray-500); }
 
-    .pod-name {
-      font-size: 0.85rem;
-      font-weight: 700;
-      color: var(--text);
-      line-height: 1.2;
-      letter-spacing: -0.01em;
-    }
+/* ── Banners ── */
+.banner-error {
+  background: var(--error-bg);
+  border: 1px solid var(--status-error);
+  border-radius: var(--radius-xl);
+  padding: 16px 18px;
+  font-size: 13px;
+  color: var(--brand-red);
+}
+.banner-gap {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  background: var(--accent);
+  border: 1px solid var(--warm-gray-1);
+  border-radius: var(--radius-xl);
+  padding: 16px 20px;
+}
+.banner-gap svg { flex-shrink: 0; margin-top: 1px; }
+.banner-text { display: flex; flex-direction: column; gap: 3px; }
+.banner-headline {
+  font-size: 14px;
+  font-weight: var(--fw-semibold);
+  color: var(--fg-strong);
+  line-height: 1.4;
+}
+.banner-sub { font-size: 13px; color: var(--fg-light); line-height: 1.5; }
 
-    .pod-main {
-      display: flex;
-      align-items: center;
-      gap: 0.65rem;
-    }
-    /* number is always white — color lives in the top stripe and meter */
-    .pod-pct {
-      font-size: 1.8rem;
-      font-weight: 800;
-      letter-spacing: -0.04em;
-      line-height: 1;
-      color: var(--pod-num);
-      flex-shrink: 0;
-      min-width: 4rem;
-    }
-    .pod-delta {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 0.05rem;
-      flex-shrink: 0;
-      line-height: 1;
-    }
-    .pod-delta .pd-arrow { font-size: 1.1rem; line-height: 1; }
-    .pod-delta .pd-val   { font-size: 0.65rem; font-weight: 700; letter-spacing: 0.01em; }
-    .pod-delta .pd-period { font-size: 0.56rem; font-weight: 400; opacity: 0.55; }
-    .pod-delta.up   { color: #73bf69; }
-    .pod-delta.down { color: #e05263; }
-    .pod-delta.flat { color: var(--muted2); }
+/* ── Stat cards ── */
+.stat-grid { display: grid; grid-template-columns: 1.7fr 1fr 1fr 1fr; gap: 16px; }
+.stat-composition { gap: 14px; }
+.stat-line { display: flex; align-items: baseline; gap: 8px; }
+.stat-hero {
+  font-size: 40px;
+  font-weight: var(--fw-light);
+  color: var(--fg-strong);
+  letter-spacing: -0.02em;
+  line-height: 1;
+}
+.stat-num {
+  font-size: 34px;
+  font-weight: var(--fw-light);
+  color: var(--fg-strong);
+  letter-spacing: -0.02em;
+  line-height: 1;
+}
+.stat-caption { font-size: 14px; color: var(--fg-light); }
+.stat-denom { font-size: 16px; color: var(--gray-500); }
+.stat-note { font-size: 12px; color: var(--fg-lighter); line-height: 1.4; }
 
-    /* sparkline — time-based trend, no fill */
-    .pod-spark {
-      flex: 1;
-      position: relative;
-      height: 42px;
-      min-width: 0;
-    }
-    .pod-spark canvas { position: absolute; inset: 0; width: 100% !important; height: 100% !important; }
-    .pod-spark-empty {
-      height: 42px;
-      display: flex;
-      align-items: center;
-      color: var(--muted2);
-      font-size: 0.68rem;
-    }
+.comp-bar {
+  display: flex;
+  height: 10px;
+  border-radius: var(--radius-pill);
+  overflow: hidden;
+  background: var(--gray-200);
+}
+.comp-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 18px;
+  font-size: 11px;
+  color: var(--fg-light);
+}
+.comp-legend > div { display: flex; align-items: center; gap: 6px; }
+.dot { width: 8px; height: 8px; border-radius: var(--radius-pill); display: block; }
 
-    /* coverage meter — 0–100 quantity bar with target marker */
-    .pod-meter {
-      position: relative;
-      height: 6px;
-      background: var(--surface2);
-      border-radius: 1px;
-      overflow: visible;
-    }
-    .pod-meter-fill {
-      height: 100%;
-      border-radius: 1px;
-      max-width: 100%;
-    }
-    /* target tick at 80% */
-    .pod-meter-target {
-      position: absolute;
-      top: -3px;
-      bottom: -3px;
-      left: 80%;
-      width: 1px;
-      background: var(--muted2);
-      transform: translateX(-50%);
-    }
-    /* show target label on pod hover */
-    .service-pod:hover .pod-meter-target::after {
-      content: '80%';
-      position: absolute;
-      top: -16px;
-      left: 50%;
-      transform: translateX(-50%);
-      font-size: 0.58rem;
-      color: var(--muted2);
-      white-space: nowrap;
-    }
+/* ── Services panel ── */
+.panel { padding: 18px 20px 8px; gap: 0; }
+.panel-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+}
+.panel-title { display: flex; align-items: baseline; gap: 10px; }
+.filters { display: flex; gap: 6px; flex-wrap: wrap; }
+.filter {
+  background: transparent;
+  border: 1px solid var(--gray-300);
+  color: var(--fg-lighter);
+  border-radius: var(--radius-pill);
+  font-family: var(--font-sans);
+  font-size: 12px;
+  font-weight: var(--fw-semibold);
+  padding: 5px 13px;
+  cursor: pointer;
+  transition: border-color 0.12s, color 0.12s;
+}
+.filter[aria-pressed="true"] {
+  background: var(--filter-on-bg);
+  border-color: var(--primary);
+  color: var(--primary);
+}
 
-    .pod-meta {
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      font-size: 0.68rem;
-      color: var(--muted);
-      flex-wrap: wrap;
-    }
-    .pod-meta-sep { color: var(--muted2); }
+.row-grid {
+  display: grid;
+  grid-template-columns: minmax(160px, 1.4fr) 78px minmax(120px, 1.6fr) 86px 112px 150px;
+  gap: 16px;
+  align-items: center;
+}
+.table-head { padding: 0 4px 8px; border-bottom: 1px solid var(--border); }
+.th {
+  font-size: 10px;
+  font-weight: var(--fw-bold);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--gray-500);
+}
+.th.right, .cell.right { text-align: right; }
+.th-spark { display: flex; flex-direction: column; gap: 3px; }
+.spark-axis {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  width: 104px;
+  font-size: 9.5px;
+  color: var(--spark-axis-text);
+  letter-spacing: 0.02em;
+  text-transform: none;
+  font-weight: var(--fw-medium);
+}
+.spark-rule { flex: 1; height: 1px; background: var(--spark-axis-rule); }
 
-    .source-tag { font-size: 0.68rem; color: var(--muted2); }
-    .source-fresh    { font-size: 0.68rem; color: #3d7a52; }
-    .source-stale    { font-size: 0.68rem; color: var(--muted2); font-style: italic; }
-    .source-missing  { font-size: 0.68rem; color: var(--red); opacity: 0.7; }
+.svc-row {
+  padding: 12px 4px;
+  border-bottom: 1px solid var(--widget-border);
+  transition: background 0.1s;
+}
+.svc-row:hover { background: var(--bg); }
+.svc-name { display: flex; align-items: center; gap: 9px; min-width: 0; }
+.svc-name span:last-child {
+  font-size: 13.5px;
+  font-weight: var(--fw-semibold);
+  color: var(--fg-strong);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.svc-dot { width: 7px; height: 7px; border-radius: var(--radius-pill); flex-shrink: 0; }
+.svc-pct {
+  font-size: 19px;
+  font-weight: var(--fw-semibold);
+  letter-spacing: -0.02em;
+  text-align: right;
+  color: var(--fg-strong);
+}
+.meter { position: relative; height: 8px; background: var(--gray-200); border-radius: var(--radius-pill); }
+.meter-fill { position: absolute; inset: 0 auto 0 0; border-radius: var(--radius-pill); }
+.meter-target { position: absolute; top: -3px; bottom: -3px; width: 1px; background: var(--gray-500); }
+.svc-delta { font-size: 12px; font-weight: var(--fw-bold); text-align: right; white-space: nowrap; }
+.svc-spark { height: 26px; display: flex; align-items: center; }
+.svc-spark svg { display: block; flex: none; overflow: visible; }
+.no-spark { font-size: 11px; color: var(--gray-400); }
+.svc-when { text-align: right; display: flex; flex-direction: column; gap: 2px; }
+.svc-date { font-size: 12px; color: var(--fg-light); }
+.svc-source { font-size: 10.5px; }
 
-    /* ── Filter row ── */
-    .filter-row {
-      display: flex;
-      gap: 0.4rem;
-      margin-bottom: 1rem;
-      flex-wrap: wrap;
-    }
-    .filter-btn {
-      background: transparent;
-      border: 1px solid var(--border);
-      border-radius: 3px;
-      color: var(--muted);
-      font-size: 0.72rem;
-      font-weight: 500;
-      padding: 0.28rem 0.7rem;
-      cursor: pointer;
-      transition: border-color 0.12s, color 0.12s;
-    }
-    .filter-btn:hover { border-color: var(--border2); color: var(--text); }
-    .filter-btn.active { border-color: var(--accent); color: var(--accent); }
+.missing-block { padding: 20px 4px 16px; }
+.missing-head { display: flex; align-items: baseline; gap: 8px; margin-bottom: 12px; }
+.missing-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 8px; }
+.missing-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  background: var(--bg);
+  border: 1px solid var(--warm-white);
+  border-radius: var(--radius-md);
+  padding: 9px 12px;
+}
+.missing-item .name {
+  font-size: 12.5px;
+  font-weight: var(--fw-medium);
+  color: var(--fg-light);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.missing-item .tag { font-size: 11px; color: var(--gray-500); white-space: nowrap; }
 
-    /* ── Empty state ── */
-    .empty-note { color: var(--muted); font-size: 0.82rem; padding: 0.5rem 0; }
+.empty { font-size: 13px; color: var(--fg-lighter); padding: 24px 4px 28px; text-align: center; }
 
-    /* ── Push date chip ── */
-    .push-chip {
-      font-size: 0.68rem;
-      color: var(--muted);
-      white-space: nowrap;
-    }
-    .push-chip.stale { color: var(--yellow); }
+/* ── Trend + movers ── */
+.bottom-grid { display: grid; grid-template-columns: 1.7fr 1fr; gap: 16px; align-items: stretch; }
+.trend-card { padding: 18px 20px 14px; gap: 16px; }
+.trend-head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
+.trend-plot { position: relative; padding-left: 52px; }
+.trend-plot svg { width: 100%; height: auto; display: block; }
+.grid-label {
+  position: absolute;
+  left: 0;
+  width: 46px;
+  text-align: right;
+  font-size: 11px;
+  color: var(--fg-lighter);
+  transform: translateY(-50%);
+}
+.trend-dates {
+  display: flex;
+  justify-content: space-between;
+  font-size: 11px;
+  color: var(--fg-lighter);
+  padding-left: 52px;
+}
 
-    /* ── Secondary section ── */
-    .secondary-row {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 1rem;
-      margin-bottom: 1.5rem;
-    }
-    @media (max-width: 900px) { .secondary-row { grid-template-columns: 1fr; } }
+.movers-card { gap: 14px; }
+.movers-head { display: flex; flex-direction: column; gap: 3px; }
+.mover {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 9px 0;
+  border-bottom: 1px solid var(--widget-border);
+}
+.mover-text { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.mover-name {
+  font-size: 13px;
+  font-weight: var(--fw-semibold);
+  color: var(--fg-strong);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.mover-cur { font-size: 11px; color: var(--fg-lighter); }
+.mover-delta { font-size: 13px; font-weight: var(--fw-bold); white-space: nowrap; }
+.movers-empty { font-size: 13px; color: var(--fg-lighter); padding: 8px 0; line-height: 1.5; }
 
-    /* ── At-risk / insights list ── */
-    .insight-list {
-      display: flex;
-      flex-direction: column;
-      gap: 1px;
-      background: var(--border);
-      border-radius: 4px;
-      overflow: hidden;
-      margin-top: 0.5rem;
-    }
-    .insight-row {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      background: var(--surface);
-      padding: 0.55rem 0.75rem;
-      gap: 0.75rem;
-      transition: background 0.1s;
-      cursor: default;
-    }
-    .insight-row:hover { background: var(--row-hover); }
-    .insight-name { font-size: 0.8rem; font-weight: 500; color: var(--text); }
-    .insight-detail { font-size: 0.72rem; color: var(--muted); }
-    .insight-pct { font-size: 0.85rem; font-weight: 700; }
-    .insight-empty { color: var(--muted); font-size: 0.78rem; padding: 0.75rem 0; text-align: center; }
-  </style>
+.footnote { font-size: 11px; color: var(--gray-500); line-height: 1.6; }
+
+/* ── Narrow viewports ── */
+@media (max-width: 1100px) {
+  .stat-grid { grid-template-columns: 1fr 1fr; }
+  .bottom-grid { grid-template-columns: 1fr; }
+  .row-grid { grid-template-columns: minmax(140px, 1.4fr) 70px 86px 104px 120px; }
+  .row-grid > .against-target, .row-grid > .th-against { display: none; }
+}
+@media (max-width: 760px) {
+  .app-header { padding: 0 16px; }
+  main { padding: 20px 16px 40px; }
+  .stat-grid { grid-template-columns: 1fr; }
+  .table-head { display: none; }
+  .row-grid { grid-template-columns: 1fr auto; gap: 8px 12px; }
+  .row-grid > .against-target, .row-grid > .svc-spark { display: none; }
+}
+</style>
 </head>
 <body>
 
-<header>
-  <div class="logo-area">
-    <h1>Coverage Dashboard</h1>
-    <div class="subtitle">LegalSifter microservices · unit test coverage</div>
+<header class="app-header">
+  <div class="brand">
+    <svg class="brand-mark" width="26" height="26" viewBox="0 0 24 24" aria-hidden="true">
+      <circle cx="7" cy="8" r="4.4" fill="var(--ls-purple)"></circle>
+      <circle cx="15.5" cy="8" r="4.4" fill="var(--ls-orange)"></circle>
+      <circle cx="11.25" cy="15.5" r="4.4" fill="var(--ls-green)"></circle>
+    </svg>
+    <div class="brand-text">
+      <div class="brand-title">Coverage</div>
+      <div class="brand-sub">Microservice unit test coverage</div>
+    </div>
   </div>
-  <div class="header-right">
-    <div class="meta" id="meta">Loading…</div>
-    <button class="theme-btn" id="themeBtn" onclick="toggleTheme()" title="Toggle light/dark mode">
-      <span id="themeIcon">☀</span>
-    </button>
-    <button class="copy-btn" id="copyBtn" onclick="copyCoverage()">
-      <svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-        <rect x="5" y="5" width="9" height="9" rx="1.5"/><path d="M11 5V3.5A1.5 1.5 0 0 0 9.5 2h-6A1.5 1.5 0 0 0 2 3.5v6A1.5 1.5 0 0 0 3.5 11H5"/>
+  <div class="header-actions">
+    <div class="meta" id="meta">Loading&hellip;</div>
+    <button class="btn-primary" id="copy-btn" type="button">
+      <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <rect x="5" y="5" width="9" height="9" rx="1.5"></rect>
+        <path d="M11 5V3.5A1.5 1.5 0 0 0 9.5 2h-6A1.5 1.5 0 0 0 2 3.5v6A1.5 1.5 0 0 0 3.5 11H5"></path>
       </svg>
-      Copy Numbers
+      <span id="copy-label">Copy numbers</span>
     </button>
   </div>
 </header>
 
-<!-- KPI row -->
-<div class="kpi-row" id="kpi-row"></div>
+<main>
 
-<!-- Secondary: two insight panels -->
-<div class="secondary-row">
-  <div class="card">
-    <div class="card-title">At Risk <span class="card-title-note">pushed within 14d · below target</span></div>
-    <div id="at-risk-list"></div>
-  </div>
-  <div class="card">
-    <div class="card-title">Coverage Changes <span class="card-title-note">since first recorded</span></div>
-    <div id="changes-list"></div>
-  </div>
-</div>
+  <div class="banner-error" id="error" role="alert" hidden></div>
 
-<!-- Service pods -->
-<div class="card" style="margin-bottom:0;">
-  <div class="card-title" style="margin-bottom:0.75rem;">
-    Services
-    <span class="card-title-note" id="service-count"></span>
+  <div class="banner-gap" id="gap-banner" hidden>
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--action-add-comment)" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+      <circle cx="12" cy="12" r="9"></circle><path d="M12 8v4.5"></path><path d="M12 16h.01"></path>
+    </svg>
+    <div class="banner-text">
+      <div class="banner-headline" id="gap-headline"></div>
+      <div class="banner-sub">Coverage is healthy where it is measured. The instrumentation gap is the largest item on this board.</div>
+    </div>
   </div>
-  <div class="filter-row" id="filter-row">
-    <button class="filter-btn active" data-filter="all">All</button>
-    <button class="filter-btn" data-filter="green">≥ 80%</button>
-    <button class="filter-btn" data-filter="warn">60–79%</button>
-    <button class="filter-btn" data-filter="red">&lt; 60%</button>
-    <button class="filter-btn" data-filter="na">No Data</button>
-  </div>
-  <div id="pod-container"></div>
-</div>
+
+  <section class="stat-grid">
+    <div class="card stat-composition">
+      <div class="eyebrow">Fleet composition</div>
+      <div class="stat-line">
+        <div class="stat-hero" id="reporting-count">&mdash;</div>
+        <div class="stat-caption">of <span id="total-count">&mdash;</span> services reporting</div>
+      </div>
+      <div class="comp-bar">
+        <div id="comp-green" style="background: var(--status-success)"></div>
+        <div id="comp-amber" style="background: var(--status-warning)"></div>
+        <div id="comp-red" style="background: var(--status-error)"></div>
+        <div id="comp-na" style="background: var(--warm-gray-1)"></div>
+      </div>
+      <div class="comp-legend">
+        <div><span class="dot" style="background: var(--status-success)"></span>At target <span id="n-green-legend"></span></div>
+        <div><span class="dot" style="background: var(--status-warning)"></span>60&ndash;<span id="target-minus"></span>% <span id="n-amber"></span></div>
+        <div><span class="dot" style="background: var(--status-error)"></span>Below 60% <span id="n-red"></span></div>
+        <div><span class="dot" style="background: var(--warm-gray-1)"></span>No data <span id="n-na"></span></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="eyebrow">Fleet average</div>
+      <div class="stat-num" id="fleet-avg">&mdash;</div>
+      <div class="stat-note">across reporting services</div>
+    </div>
+
+    <div class="card">
+      <div class="eyebrow">Meeting target</div>
+      <div class="stat-line">
+        <div class="stat-num" id="n-green">&mdash;</div>
+        <div class="stat-denom">/ <span id="reporting-denom"></span></div>
+      </div>
+      <div class="stat-note">threshold <span id="target-label"></span></div>
+    </div>
+
+    <div class="card">
+      <div class="eyebrow">Below target</div>
+      <div class="stat-num" id="below-count">&mdash;</div>
+      <div class="stat-note" id="below-sub"></div>
+    </div>
+  </section>
+
+  <section class="card panel">
+    <div class="panel-head">
+      <div class="panel-title">
+        <span class="eyebrow">Services</span>
+        <span class="count" id="service-count"></span>
+      </div>
+      <div class="filters" id="filters"></div>
+    </div>
+
+    <div id="table" hidden>
+      <div class="row-grid table-head">
+        <div class="th">Service</div>
+        <div class="th right">Coverage</div>
+        <div class="th th-against">Against target</div>
+        <div class="th right">Change</div>
+        <div class="th th-spark">
+          <div>Trend over time</div>
+          <div class="spark-axis">
+            <span id="spark-from"></span>
+            <span class="spark-rule"></span>
+            <span id="spark-to"></span>
+          </div>
+        </div>
+        <div class="th right">Last measured</div>
+      </div>
+      <div id="rows"></div>
+    </div>
+
+    <div class="missing-block" id="missing-block" hidden>
+      <div class="missing-head">
+        <span class="eyebrow">No coverage artifact</span>
+        <span class="count" id="missing-count"></span>
+      </div>
+      <div class="missing-grid" id="missing"></div>
+    </div>
+
+    <div class="empty" id="empty-filter" hidden>No services in this band.</div>
+  </section>
+
+  <section class="bottom-grid">
+    <div class="card trend-card" id="trend-card" hidden>
+      <div class="trend-head">
+        <div class="eyebrow">Fleet average over time</div>
+        <div class="count" id="trend-range"></div>
+      </div>
+      <div class="trend-plot" id="trend-plot"></div>
+      <div class="trend-dates">
+        <span id="trend-first-date"></span>
+        <span id="trend-last-date"></span>
+      </div>
+    </div>
+
+    <div class="card movers-card">
+      <div class="movers-head">
+        <div class="eyebrow">Movers</div>
+        <div class="count">Change since first recorded</div>
+      </div>
+      <div id="movers"></div>
+      <div class="movers-empty" id="movers-empty" hidden>No coverage has moved since tracking began.</div>
+    </div>
+  </section>
+
+  <div class="footnote">Icons shown are stand-ins &mdash; production should use FontAwesome Pro.</div>
+</main>
 
 <script>
-  const CSV_URL    = "./coverage-history.csv";
-  const TARGET     = 80;
-  const STALE_DAYS = 30;
+(function () {
+  'use strict';
 
-  // ── Theme ─────────────────────────────────────────────────────────────────
-  function applyTheme(theme) {
-    document.documentElement.dataset.theme = theme;
-    document.getElementById('themeIcon').textContent = theme === 'light' ? '☾' : '☀';
-    localStorage.setItem('theme', theme);
-  }
-  function toggleTheme() {
-    const next = document.documentElement.dataset.theme === 'light' ? 'dark' : 'light';
-    applyTheme(next);
-    renderPods(); // rebuild sparklines with correct colors
-  }
-  applyTheme(localStorage.getItem('theme') || 'dark');
+  var SOURCES = [
+    './coverage-history.csv',
+    'https://brian-toombs-ls.github.io/coverage-dashboard/coverage-history.csv'
+  ];
 
-  function cssVar(name) {
-    return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
-  }
+  var CONFIG = {
+    target: 80,
+    sortBy: 'Lowest coverage first', // 'Highest coverage first' | 'Name'
+    showTrend: true
+  };
 
-  // ── Helpers ──────────────────────────────────────────────────────────────
+  var state = {
+    loaded: false,
+    error: null,
+    filter: 'all',
+    copied: false,
+    repos: [],
+    lastDate: '',
+    avgSeries: []
+  };
 
-  function statusColor(pct) {
-    if (pct === null) return "#2c3036";
-    if (pct >= TARGET) return "#6ccf8e";
-    if (pct >= 60)     return "#f5a623";
-    return "#f2495c";
-  }
+  var $ = function (id) { return document.getElementById(id); };
+  var text = function (id, v) { $(id).textContent = v; };
+  var show = function (id, on) { $(id).hidden = !on; };
 
-  function daysSince(dateStr) {
-    if (!dateStr) return null;
-    return Math.floor((Date.now() - new Date(dateStr).getTime()) / 86400000);
-  }
-
-  function pushLabel(pushedAt) {
-    const days = daysSince(pushedAt);
-    if (days === null) return null;
-    if (days === 0) return { text: 'pushed today', stale: false };
-    if (days === 1) return { text: 'pushed 1d ago', stale: false };
-    return { text: `pushed ${days}d ago`, stale: days >= STALE_DAYS };
-  }
-
-  // ── Pod state ─────────────────────────────────────────────────────────────
-  let filterState = 'all';
-  let podData     = [];
-  const sparkCharts = {};
-
-  function priorityOf(r) {
-    if (r.pct === null) return 3;
-    if (r.pct < TARGET) return 1;
-    return 2;
-  }
-
-  function renderPods() {
-    for (const key of Object.keys(sparkCharts)) {
-      sparkCharts[key].destroy();
-      delete sparkCharts[key];
-    }
-
-    let rows = [...podData];
-    if (filterState !== 'all') {
-      rows = rows.filter(r => {
-        if (filterState === 'green') return r.pct !== null && r.pct >= TARGET;
-        if (filterState === 'warn')  return r.pct !== null && r.pct >= 60 && r.pct < TARGET;
-        if (filterState === 'red')   return r.pct !== null && r.pct < 60;
-        if (filterState === 'na')    return r.pct === null;
-        return true;
-      });
-    }
-
-    // Sort: below target (worst first) → at target (highest first) → no data
-    rows.sort((a, b) => {
-      const pa = priorityOf(a), pb = priorityOf(b);
-      if (pa !== pb) return pa - pb;
-      if (pa === 1) return (a.pct ?? 100) - (b.pct ?? 100);
-      if (pa === 2) return (b.pct ?? 0) - (a.pct ?? 0);
-      return a.name.localeCompare(b.name);
-    });
-
-    const container = document.getElementById('pod-container');
-    container.innerHTML = '';
-
-    const groupDefs = [
-      { key: 1, label: 'Below Target', rows: rows.filter(r => priorityOf(r) === 1) },
-      { key: 2, label: 'At Target',    rows: rows.filter(r => priorityOf(r) === 2) },
-      { key: 3, label: 'No Data',      rows: rows.filter(r => priorityOf(r) === 3) },
-    ];
-
-    for (const group of groupDefs) {
-      if (group.rows.length === 0) continue;
-
-      const label = document.createElement('div');
-      label.className = 'group-label';
-      label.innerHTML = `${group.label} <span class="gl-count">${group.rows.length}</span>`;
-      container.appendChild(label);
-
-      const grid = document.createElement('div');
-      grid.className = 'service-grid';
-      container.appendChild(grid);
-
-      for (const r of group.rows) {
-        const color = statusColor(r.pct);
-        const hasHistory = r.history && r.history.filter(h => h.pct !== null).length >= 2;
-        const push = pushLabel(r.pushed_at);
-        const statusClass = r.pct === null ? 's-na' : r.pct >= TARGET ? 's-green' : r.pct >= 60 ? 's-yellow' : 's-red';
-
-        const pod = document.createElement('div');
-        pod.className = `service-pod ${statusClass}`;
-        pod.innerHTML = `
-          <div class="pod-name">${r.name}</div>
-          <div class="pod-main">
-            <div class="pod-pct">${r.pct !== null ? r.pct.toFixed(1) + '%' : '—'}</div>
-            ${r.delta !== null
-              ? `<div class="pod-delta ${r.delta > 0.05 ? 'up' : r.delta < -0.05 ? 'down' : 'flat'}">
-                  <span class="pd-arrow">${r.delta > 0.05 ? '↑' : r.delta < -0.05 ? '↓' : '→'}</span>
-                  <span class="pd-val">${r.delta > 0 ? '+' : ''}${r.delta.toFixed(1)}%</span>
-                  <span class="pd-period">${r.deltaPeriod}</span>
-                 </div>`
-              : ''}
-            ${hasHistory
-              ? `<div class="pod-spark"><canvas id="spark-${r.name}"></canvas></div>`
-              : `<div class="pod-spark-empty">no history yet</div>`}
-          </div>
-          <div class="pod-meter">
-            <div class="pod-meter-fill" style="width:${Math.min(100, r.pct ?? 0)}%;background:${color};opacity:0.55"></div>
-            <div class="pod-meter-target"></div>
-          </div>
-          <div class="pod-meta">
-            <span>${r.date}</span>
-            <span class="pod-meta-sep">·</span>
-            <span class="${r.source === 'fresh' ? 'source-fresh' : r.source === 'unavailable' ? 'source-missing' : 'source-stale'}">${r.source}</span>
-            ${push ? `<span class="pod-meta-sep">·</span><span class="push-chip${push.stale ? ' stale' : ''}">${push.text}</span>` : ''}
-          </div>
-        `;
-        grid.appendChild(pod);
-      }
-    }
-
-    document.getElementById('service-count').textContent =
-      `${rows.length} of ${podData.length}`;
-
-    // Sparklines (after DOM is built)
-    for (const r of rows) {
-      if (!r.history) continue;
-      const valid = r.history.filter(h => h.pct !== null);
-      if (valid.length < 2) continue;
-      const canvas = document.getElementById(`spark-${r.name}`);
-      if (!canvas) continue;
-
-      const color = statusColor(r.pct);
-      const yValues = r.history.map(h => h.pct);
-      const vals    = yValues.filter(v => v !== null);
-      const spread  = Math.max(...vals) - Math.min(...vals);
-      // Tight zoom: pad is 15% of spread but at least 0.5pp, making even tiny
-      // fluctuations visible. A stable repo shows a near-flat line near center.
-      const pad     = Math.max(0.5, spread * 0.15);
-      const minY    = Math.max(0,   Math.min(...vals) - pad);
-      const maxY    = Math.min(100, Math.max(...vals) + pad);
-
-      sparkCharts[r.name] = new Chart(canvas, {
-        type: 'line',
-        data: {
-          labels: r.history.map(h => h.date),
-          datasets: [{ data: yValues,
-            borderColor: cssVar('--spark-line'),
-            backgroundColor: 'transparent', borderWidth: 1.5,
-            pointRadius: 0, pointHoverRadius: 4,
-            pointHoverBackgroundColor: cssVar('--spark-line'),
-            spanGaps: true, tension: 0.3, fill: false }],
-        },
-        options: {
-          responsive: true, maintainAspectRatio: false, animation: false,
-          interaction: { mode: 'index', intersect: false },
-          plugins: {
-            legend: { display: false },
-            tooltip: {
-              enabled: true,
-              backgroundColor: cssVar('--tip-bg'),
-              borderColor: cssVar('--tip-border'),
-              borderWidth: 1,
-              titleColor: cssVar('--tip-title'),
-              bodyColor: cssVar('--tip-body'),
-              titleFont: { size: 10 },
-              bodyFont: { size: 11, weight: 'bold' },
-              padding: 6,
-              callbacks: {
-                title: items => items[0].label,
-                label: ctx => ctx.raw !== null ? ` ${ctx.raw.toFixed(1)}%` : ' N/A',
-              },
-            },
-          },
-          scales: { x: { display: false }, y: { display: false, min: minY, max: maxY } },
-        },
-      });
-    }
-  }
-
-  // ── Copy ─────────────────────────────────────────────────────────────────
-  function copyCoverage() {
-    const lines = podData
-      .slice().sort((a, b) => a.name.localeCompare(b.name))
-      .map(r => `${r.name}: ${r.pct !== null ? r.pct.toFixed(1) + '%' : 'N/A'}`)
-      .join('\n');
-    navigator.clipboard.writeText(lines).then(() => {
-      const btn = document.getElementById('copyBtn');
-      btn.classList.add('copied');
-      btn.innerHTML = `<svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="2 8 6 12 14 4"/></svg> Copied!`;
-      setTimeout(() => {
-        btn.classList.remove('copied');
-        btn.innerHTML = `<svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="5" width="9" height="9" rx="1.5"/><path d="M11 5V3.5A1.5 1.5 0 0 0 9.5 2h-6A1.5 1.5 0 0 0 2 3.5v6A1.5 1.5 0 0 0 3.5 11H5"/></svg> Copy Numbers`;
-      }, 2200);
+  function esc(s) {
+    return String(s).replace(/[&<>"]/g, function (c) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c];
     });
   }
 
-  // ── Load ─────────────────────────────────────────────────────────────────
+  /* ── Data ───────────────────────────────────────────────────────────── */
+
   async function load() {
-    const resp = await fetch(CSV_URL);
-    const text = await resp.text();
-    const { data } = Papa.parse(text, { header: true, skipEmptyLines: true });
+    var body = null;
+    for (var i = 0; i < SOURCES.length; i++) {
+      try {
+        var resp = await fetch(SOURCES[i]);
+        if (!resp.ok) continue;
+        var t = await resp.text();
+        if (t.indexOf('coverage_pct') >= 0) { body = t; break; }
+      } catch (e) { /* try next source */ }
+    }
+    if (!body) {
+      state.error = 'Could not load coverage-history.csv.';
+      render();
+      return;
+    }
 
-    const byRepo = {};
-    for (const row of data) {
-      if (!byRepo[row.repo]) byRepo[row.repo] = [];
-      byRepo[row.repo].push({
-        date:      row.date,
-        pct:       row.coverage_pct !== "" ? parseFloat(row.coverage_pct) : null,
-        source:    row.source,
-        pushed_at: row.repo_pushed_at || "",
+    var lines = body.trim().split(/\r?\n/);
+    var head = lines[0].split(',').map(function (s) { return s.trim(); });
+    var iDate = head.indexOf('date');
+    var iRepo = head.indexOf('repo');
+    var iPct = head.indexOf('coverage_pct');
+    var iSrc = head.indexOf('source');
+
+    var byRepo = {};
+    var dateSet = {};
+    for (var n = 1; n < lines.length; n++) {
+      var c = lines[n].split(',');
+      if (c.length < 2) continue;
+      var repo = (c[iRepo] || '').trim();
+      if (!repo) continue;
+      var date = (c[iDate] || '').trim();
+      var raw = (c[iPct] || '').trim();
+      dateSet[date] = true;
+      (byRepo[repo] = byRepo[repo] || []).push({
+        date: date,
+        pct: raw === '' ? null : parseFloat(raw),
+        source: (c[iSrc] || '').trim()
       });
     }
-    for (const r of Object.keys(byRepo)) {
-      byRepo[r].sort((a, b) => a.date.localeCompare(b.date));
-    }
 
-    const allDates = [...new Set(data.map(r => r.date))].sort();
-    const repos    = Object.keys(byRepo).sort();
-    const lastDate = allDates[allDates.length - 1];
+    var dates = Object.keys(dateSet).sort();
+    var lastDate = dates[dates.length - 1] || '';
+    var names = Object.keys(byRepo).sort();
 
-    const latest = {};
-    for (const repo of repos) {
-      const rows = byRepo[repo];
-      latest[repo] = rows[rows.length - 1];
-    }
+    var cutoff = new Date(lastDate);
+    cutoff.setDate(cutoff.getDate() - 30);
+    var iso30 = cutoff.toISOString().slice(0, 10);
 
-    document.getElementById("meta").textContent =
-      `${lastDate} · ${repos.length} services`;
-
-    // ── Stats ──
-    const validPcts    = repos.map(r => latest[r]?.pct).filter(p => p !== null);
-    const avg          = validPcts.length ? validPcts.reduce((a, b) => a + b, 0) / validPcts.length : null;
-    const atTarget     = validPcts.filter(p => p >= TARGET).length;
-    const below60      = validPcts.filter(p => p < 60).length;
-    const notReporting = repos.filter(r => latest[r]?.pct === null).length;
-    const highest      = validPcts.length ? Math.max(...validPcts) : null;
-    const highestRepo  = highest !== null ? repos.find(r => latest[r]?.pct === highest)?.split("/")[1] : null;
-    const belowCount   = validPcts.length - atTarget;
-    const targetColor  = atTarget === repos.length ? '#6ccf8e'
-                       : atTarget >= repos.length * 0.7 ? '#f5a623' : '#f2495c';
-
-    // ── KPI cards ──
-    document.getElementById("kpi-row").innerHTML = `
-      <div class="stat-card hero">
-        <div class="stat-label">Meeting Target ≥ ${TARGET}%</div>
-        <div class="stat-value" style="color:${targetColor}">${atTarget} <span style="font-size:1.2rem;color:var(--muted2)">/ ${repos.length}</span></div>
-        <div class="stat-sub">${validPcts.length} reporting · ${notReporting} no data</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-label">Fleet Average</div>
-        <div class="stat-value" style="color:${statusColor(avg)}">${avg !== null ? avg.toFixed(1) + '%' : '—'}</div>
-        <div class="stat-sub">all reporting services</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-label">Highest</div>
-        <div class="stat-value" style="color:#6ccf8e">${highest !== null ? highest.toFixed(1) + '%' : '—'}</div>
-        <div class="stat-sub">${highestRepo || '—'}</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-label">Below Target</div>
-        <div class="stat-value" style="color:${belowCount > 0 ? '#f2495c' : '#6ccf8e'}">${belowCount}</div>
-        <div class="stat-sub">${below60} critical · below 60%</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-label">Not Reporting</div>
-        <div class="stat-value" style="color:${notReporting > 0 ? '#f5a623' : '#6ccf8e'}">${notReporting}</div>
-        <div class="stat-sub">no artifact found</div>
-      </div>
-    `;
-
-    // ── Coverage Changes (first recorded → latest) ──
-    const changesEl = document.getElementById('changes-list');
-    const changeItems = repos.map(repo => {
-      const rows = byRepo[repo].filter(r => r.pct !== null);
-      if (rows.length < 2) return null;
-      const first = rows[0];
-      const last  = rows[rows.length - 1];
-      return { name: repo.split('/')[1], delta: last.pct - first.pct, cur: last.pct };
-    }).filter(Boolean).filter(r => Math.abs(r.delta) >= 0.05);
-
-    changeItems.sort((a, b) => Math.abs(b.delta) - Math.abs(a.delta));
-
-    if (changeItems.length === 0) {
-      changesEl.innerHTML = `<div class="insight-empty">Not enough history yet</div>`;
-    } else {
-      const list = document.createElement('div');
-      list.className = 'insight-list';
-      for (const item of changeItems.slice(0, 8)) {
-        const up = item.delta >= 0;
-        const row = document.createElement('div');
-        row.className = 'insight-row';
-        row.innerHTML = `
-          <div>
-            <div class="insight-name">${item.name}</div>
-            <div class="insight-detail">${item.cur.toFixed(1)}% current</div>
-          </div>
-          <div class="insight-pct" style="color:${up ? '#6ccf8e' : '#f2495c'}">
-            ${up ? '▲' : '▼'} ${up ? '+' : ''}${item.delta.toFixed(1)}%
-          </div>
-        `;
-        list.appendChild(row);
+    var repos = names.map(function (full) {
+      var rows = byRepo[full].slice().sort(function (a, b) { return a.date.localeCompare(b.date); });
+      var cur = rows[rows.length - 1];
+      var withPct = rows.filter(function (r) { return r.pct !== null; });
+      var older = withPct.filter(function (r) { return r.date <= iso30; });
+      var ref = older.length ? older[older.length - 1] : (withPct[0] || null);
+      var delta = null, deltaDays = null;
+      if (cur.pct !== null && ref && ref.date !== cur.date) {
+        delta = cur.pct - ref.pct;
+        deltaDays = Math.round((new Date(cur.date) - new Date(ref.date)) / 86400000);
       }
-      changesEl.appendChild(list);
-    }
-
-    // ── At Risk: recently-active repos below target ──
-    const atRiskList = document.getElementById('at-risk-list');
-    const thirtyAgo = new Date(lastDate);
-    thirtyAgo.setDate(thirtyAgo.getDate() - 30);
-    const iso30Ago = thirtyAgo.toISOString().slice(0, 10);
-
-    const atRisk = repos
-      .filter(r => {
-        const cur = latest[r];
-        if (cur?.pct === null || cur?.pct >= TARGET) return false;
-        const pushed = [...byRepo[r]].reverse().map(row => row.pushed_at).find(p => p) || '';
-        const days = daysSince(pushed);
-        return days !== null && days <= 14;
-      })
-      .sort((a, b) => (latest[a]?.pct ?? 100) - (latest[b]?.pct ?? 100))
-      .slice(0, 6);
-
-    if (atRisk.length === 0) {
-      atRiskList.innerHTML = `<div class="insight-empty">No active repos below target</div>`;
-    } else {
-      const list = document.createElement('div');
-      list.className = 'insight-list';
-      for (const repo of atRisk) {
-        const cur = latest[repo];
-        const name = repo.split('/')[1];
-        const pushed = [...byRepo[repo]].reverse().map(r => r.pushed_at).find(p => p) || '';
-        const days = daysSince(pushed);
-        const row = document.createElement('div');
-        row.className = 'insight-row';
-        row.innerHTML = `
-          <div>
-            <div class="insight-name">${name}</div>
-            <div class="insight-detail">pushed ${days === 0 ? 'today' : days + 'd ago'}</div>
-          </div>
-          <div class="insight-pct" style="color:${statusColor(cur.pct)}">${cur.pct.toFixed(1)}%</div>
-        `;
-        list.appendChild(row);
-      }
-      atRiskList.appendChild(list);
-    }
-
-    // ── Pod data ──
-    for (const repo of repos) {
-      const rows = byRepo[repo];
-      const cur  = rows[rows.length - 1];
-
-      const older   = rows.filter(r => r.date <= iso30Ago && r.pct !== null);
-      const baseRow = older.length ? older[older.length - 1] : null;
-      // Fall back to earliest available if less than 30 days of history
-      const refRow  = baseRow ?? (rows.filter(r => r.pct !== null)[0] ?? null);
-      const delta   = cur.pct !== null && refRow && refRow.date !== cur.date
-        ? cur.pct - refRow.pct : null;
-      const deltaDays = delta !== null
-        ? Math.round((new Date(cur.date) - new Date(refRow.date)) / 86400000) : null;
-      const deltaPeriod = deltaDays !== null
-        ? (deltaDays >= 28 ? '30d' : deltaDays >= 13 ? '2w' : `${deltaDays}d`) : '';
-      const pushedAt = [...rows].reverse().map(r => r.pushed_at).find(p => p) || '';
-
-      podData.push({
-        name:      repo.split("/")[1],
-        pct:       cur.pct,
-        date:      cur.date,
-        delta,
-        deltaPeriod,
-        source:    cur.source,
-        pushed_at: pushedAt,
-        history:   rows.map(r => ({ date: r.date, pct: r.pct })),
-      });
-    }
-
-    renderPods();
-
-    document.querySelectorAll(".filter-btn").forEach(btn => {
-      btn.addEventListener("click", () => {
-        document.querySelectorAll(".filter-btn").forEach(b => b.classList.remove("active"));
-        btn.classList.add("active");
-        filterState = btn.dataset.filter;
-        renderPods();
-      });
+      var first = withPct.length ? withPct[0].pct : null;
+      return {
+        full: full,
+        name: full.indexOf('/') >= 0 ? full.split('/')[1] : full,
+        pct: cur.pct,
+        date: cur.date,
+        source: cur.source,
+        delta: delta,
+        deltaDays: deltaDays,
+        totalDelta: cur.pct !== null && first !== null && withPct.length > 1 ? cur.pct - first : null,
+        history: withPct.map(function (r) { return r.pct; })
+      };
     });
+
+    var avgSeries = dates.map(function (d) {
+      var vals = names.map(function (nm) {
+        var row = byRepo[nm].find(function (r) { return r.date === d; });
+        return row ? row.pct : null;
+      }).filter(function (v) { return v !== null && !isNaN(v); });
+      return { date: d, avg: vals.length ? vals.reduce(function (a, b) { return a + b; }, 0) / vals.length : null };
+    }).filter(function (p) { return p.avg !== null; });
+
+    state.loaded = true;
+    state.repos = repos;
+    state.lastDate = lastDate;
+    state.avgSeries = avgSeries;
+    render();
   }
 
-  load().catch(err => {
-    document.body.innerHTML += `<p style="color:var(--red);margin-top:2rem">Failed to load: ${err.message}</p>`;
-  });
+  /* ── Derivation helpers ─────────────────────────────────────────────── */
+
+  function target() {
+    var t = parseFloat(CONFIG.target);
+    return isNaN(t) ? 80 : t;
+  }
+
+  function bandOf(pct) {
+    if (pct === null || pct === undefined || isNaN(pct)) return 'na';
+    if (pct >= target()) return 'green';
+    if (pct >= 60) return 'warn';
+    return 'red';
+  }
+
+  function colorOf(band) {
+    return band === 'green' ? 'var(--status-success)'
+      : band === 'warn' ? 'var(--status-warning)'
+      : band === 'red' ? 'var(--status-error)'
+      : 'var(--warm-gray-1)';
+  }
+
+  function shortDate(iso) {
+    if (!iso) return '';
+    var d = new Date(iso + 'T00:00:00');
+    if (isNaN(d)) return iso;
+    return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+  }
+
+  // Sparkline geometry. The Y range zooms to mean ± 1 SD so sub-1% moves stay visible,
+  // then widens to cover any point outside that band.
+  function spark(hist) {
+    if (!hist || hist.length < 2) return null;
+    var W = 104, H = 26, P = 4.5, n = hist.length;
+    var mean = hist.reduce(function (a, b) { return a + b; }, 0) / n;
+    var sd = Math.sqrt(hist.reduce(function (a, b) { return a + (b - mean) * (b - mean); }, 0) / n);
+    var lo = Math.min(Math.min.apply(null, hist), mean - sd);
+    var hi = Math.max(Math.max.apply(null, hist), mean + sd);
+    var pad = Math.max(0.3, (hi - lo) * 0.16);
+    lo -= pad; hi += pad;
+    var span = hi - lo || 1;
+    var X = function (i) { return 1 + (i / (n - 1)) * (W - 2); };
+    var Y = function (v) { return P + (1 - (v - lo) / span) * (H - 2 * P); };
+    var iMin = 0, iMax = 0;
+    hist.forEach(function (v, i) { if (v < hist[iMin]) iMin = i; if (v > hist[iMax]) iMax = i; });
+    var bandTop = Y(mean + sd), bandBot = Y(mean - sd);
+    return {
+      points: hist.map(function (v, i) { return X(i).toFixed(1) + ',' + Y(v).toFixed(1); }).join(' '),
+      hasBand: sd > 0.005,
+      bandY: bandTop.toFixed(1),
+      bandH: Math.max(0, bandBot - bandTop).toFixed(1),
+      minX: X(iMin).toFixed(1), minY: Y(hist[iMin]).toFixed(1),
+      maxX: X(iMax).toFixed(1), maxY: Y(hist[iMax]).toFixed(1),
+      endX: X(n - 1).toFixed(1), endY: Y(hist[n - 1]).toFixed(1),
+      showExtremes: n > 2 && hist[iMax] - hist[iMin] > 0.005 && iMin !== n - 1 && iMax !== n - 1
+    };
+  }
+
+  function sparkSvg(sp) {
+    var band = sp.hasBand
+      ? '<rect x="1" y="' + sp.bandY + '" width="102" height="' + sp.bandH + '" fill="var(--fg-strong)" fill-opacity="0.09"></rect>'
+      : '';
+    var extremes = sp.showExtremes
+      ? '<circle cx="' + sp.minX + '" cy="' + sp.minY + '" r="1.3" fill="var(--gray-500)"></circle>' +
+        '<circle cx="' + sp.maxX + '" cy="' + sp.maxY + '" r="1.3" fill="var(--gray-500)"></circle>'
+      : '';
+    return '<svg viewBox="0 0 104 26" width="104" height="26" aria-hidden="true">' +
+      band +
+      '<polyline points="' + sp.points + '" fill="none" stroke="var(--fg)" stroke-width="1" stroke-linejoin="round" stroke-linecap="round"></polyline>' +
+      extremes +
+      '<circle cx="' + sp.endX + '" cy="' + sp.endY + '" r="2" fill="var(--brand-red)"></circle>' +
+      '</svg>';
+  }
+
+  /* ── Actions ────────────────────────────────────────────────────────── */
+
+  function onCopy() {
+    var lines = state.repos.slice()
+      .sort(function (a, b) { return a.name.localeCompare(b.name); })
+      .map(function (r) { return r.name + ': ' + (r.pct !== null ? r.pct.toFixed(1) + '%' : 'N/A'); })
+      .join('\n');
+    var done = function () {
+      state.copied = true;
+      text('copy-label', 'Copied');
+      setTimeout(function () {
+        state.copied = false;
+        text('copy-label', 'Copy numbers');
+      }, 2200);
+    };
+    if (navigator.clipboard) navigator.clipboard.writeText(lines).then(done, done);
+    else done();
+  }
+
+  function setFilter(key) {
+    state.filter = key;
+    render();
+  }
+
+  /* ── Render ─────────────────────────────────────────────────────────── */
+
+  function render() {
+    var T = target();
+    var repos = state.repos;
+
+    show('error', !!state.error);
+    if (state.error) text('error', state.error);
+
+    text('meta', state.loaded ? state.lastDate + ' · ' + repos.length + ' services' : 'Loading…');
+
+    var withPct = repos.filter(function (r) { return r.pct !== null; });
+    var nGreen = withPct.filter(function (r) { return r.pct >= T; }).length;
+    var nAmber = withPct.filter(function (r) { return r.pct >= 60 && r.pct < T; }).length;
+    var nRed = withPct.filter(function (r) { return r.pct < 60; }).length;
+    var nNa = repos.length - withPct.length;
+    var total = repos.length || 1;
+    var avg = withPct.length ? withPct.reduce(function (a, r) { return a + r.pct; }, 0) / withPct.length : null;
+    var belowCount = withPct.length - nGreen;
+
+    // Gap banner
+    show('gap-banner', state.loaded && nNa > 0);
+    text('gap-headline', nNa + ' of ' + repos.length + ' services publish no coverage artifact.');
+
+    // Composition
+    text('reporting-count', withPct.length);
+    text('total-count', repos.length);
+    $('comp-green').style.width = (nGreen / total * 100).toFixed(2) + '%';
+    $('comp-amber').style.width = (nAmber / total * 100).toFixed(2) + '%';
+    $('comp-red').style.width = (nRed / total * 100).toFixed(2) + '%';
+    $('comp-na').style.width = (nNa / total * 100).toFixed(2) + '%';
+    text('n-green-legend', nGreen);
+    text('target-minus', T - 1);
+    text('n-amber', nAmber);
+    text('n-red', nRed);
+    text('n-na', nNa);
+
+    // Fleet average
+    text('fleet-avg', avg === null ? '—' : avg.toFixed(1) + '%');
+
+    // Meeting target
+    text('n-green', nGreen);
+    $('n-green').style.color = nGreen === withPct.length && withPct.length > 0 ? 'var(--status-success)'
+      : nGreen >= withPct.length * 0.7 ? 'var(--status-warning)'
+      : 'var(--status-error)';
+    text('reporting-denom', withPct.length);
+    text('target-label', '≥ ' + T + '%');
+
+    // Below target
+    text('below-count', belowCount);
+    $('below-count').style.color = belowCount > 0 ? 'var(--status-error)' : 'var(--status-success)';
+    text('below-sub', nRed > 0 ? nRed + ' below 60%' : 'none critical');
+
+    // Filters
+    var filterDefs = [
+      { key: 'all', label: 'All' },
+      { key: 'green', label: '≥ ' + T + '%' },
+      { key: 'warn', label: '60–' + (T - 1) + '%' },
+      { key: 'red', label: '< 60%' },
+      { key: 'na', label: 'No data' }
+    ];
+    var filters = $('filters');
+    filters.innerHTML = '';
+    filterDefs.forEach(function (f) {
+      var b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'filter';
+      b.textContent = f.label;
+      b.setAttribute('aria-pressed', String(state.filter === f.key));
+      b.addEventListener('click', function () { setFilter(f.key); });
+      filters.appendChild(b);
+    });
+
+    // Rows
+    var pass = function (r) {
+      var b = bandOf(r.pct);
+      if (state.filter === 'all') return true;
+      if (state.filter === 'na') return b === 'na';
+      return b === state.filter;
+    };
+
+    var reportingRows = repos.filter(function (r) { return r.pct !== null && pass(r); });
+    if (CONFIG.sortBy === 'Highest coverage first') reportingRows.sort(function (a, b) { return b.pct - a.pct; });
+    else if (CONFIG.sortBy === 'Name') reportingRows.sort(function (a, b) { return a.name.localeCompare(b.name); });
+    else reportingRows.sort(function (a, b) { return a.pct - b.pct; });
+
+    var missingRows = repos.filter(function (r) { return r.pct === null && pass(r); })
+      .sort(function (a, b) { return a.name.localeCompare(b.name); });
+
+    text('service-count', (reportingRows.length + missingRows.length) + ' of ' + repos.length);
+
+    show('table', reportingRows.length > 0);
+    $('rows').innerHTML = reportingRows.map(function (r) {
+      var color = colorOf(bandOf(r.pct));
+      var sp = spark(r.history);
+      var d = r.delta;
+      var period = r.deltaDays === null ? ''
+        : r.deltaDays >= 28 ? '30d'
+        : r.deltaDays >= 13 ? '2w'
+        : r.deltaDays + 'd';
+      // A change inside the flat band prints as +0.0, never -0.0.
+      var delta = d === null ? '—'
+        : d > 0.05 ? '↑ +' + d.toFixed(1) + '%' + (period ? ' ' + period : '')
+        : d < -0.05 ? '↓ ' + d.toFixed(1) + '%' + (period ? ' ' + period : '')
+        : '→ ' + Math.abs(d).toFixed(1) + '%' + (period ? ' ' + period : '');
+      var deltaColor = d === null ? 'var(--gray-400)'
+        : d > 0.05 ? 'var(--ls-green)'
+        : d < -0.05 ? 'var(--status-error)'
+        : 'var(--gray-500)';
+      var source = r.source === 'fresh' ? 'fresh' : r.source === 'carried_forward' ? 'carried forward' : r.source;
+      var sourceColor = r.source === 'fresh' ? 'var(--ls-green)' : 'var(--gray-500)';
+
+      return '<div class="row-grid svc-row">' +
+        '<div class="svc-name"><span class="svc-dot" style="background: ' + color + '"></span><span>' + esc(r.name) + '</span></div>' +
+        '<div class="svc-pct">' + r.pct.toFixed(1) + '%</div>' +
+        '<div class="against-target meter">' +
+          '<div class="meter-fill" style="width: ' + Math.min(100, r.pct).toFixed(1) + '%; background: ' + color + '"></div>' +
+          '<div class="meter-target" style="left: ' + T + '%"></div>' +
+        '</div>' +
+        '<div class="svc-delta" style="color: ' + deltaColor + '">' + delta + '</div>' +
+        '<div class="svc-spark">' + (sp ? sparkSvg(sp) : '<span class="no-spark">no history</span>') + '</div>' +
+        '<div class="svc-when">' +
+          '<div class="svc-date">' + esc(r.date) + '</div>' +
+          '<div class="svc-source" style="color: ' + sourceColor + '">' + esc(source) + '</div>' +
+        '</div>' +
+      '</div>';
+    }).join('');
+
+    show('missing-block', missingRows.length > 0);
+    text('missing-count', missingRows.length);
+    $('missing').innerHTML = missingRows.map(function (r) {
+      return '<div class="missing-item"><span class="name">' + esc(r.name) + '</span><span class="tag">no artifact</span></div>';
+    }).join('');
+
+    show('empty-filter', state.loaded && reportingRows.length === 0 && missingRows.length === 0);
+
+    renderTrend();
+    renderMovers();
+  }
+
+  function renderTrend() {
+    var series = state.avgSeries;
+    var on = CONFIG.showTrend && series.length > 1;
+    show('trend-card', on);
+    if (!on) return;
+
+    var W = 620, H = 96;
+    var vals = series.map(function (p) { return p.avg; });
+    var mn = Math.min.apply(null, vals), mx = Math.max.apply(null, vals);
+    var pad = Math.max(0.5, (mx - mn) * 0.4);
+    mn = Math.max(0, mn - pad); mx = Math.min(100, mx + pad);
+    var span = mx - mn || 1;
+    var yOf = function (v) { return H - ((v - mn) / span) * H; };
+    var xOf = function (i) { return (i / (series.length - 1)) * W; };
+
+    var points = series.map(function (p, i) { return xOf(i).toFixed(1) + ',' + yOf(p.avg).toFixed(1); }).join(' ');
+    var lastX = xOf(series.length - 1).toFixed(1);
+    var lastY = yOf(vals[vals.length - 1]).toFixed(1);
+
+    var gridLines = [0, 0.5, 1].map(function (f) {
+      var v = mn + span * (1 - f);
+      var y = Math.min(H - 0.5, Math.max(0.5, yOf(v)));
+      return { y: y.toFixed(1), top: (y / H * 100).toFixed(2) + '%', label: v.toFixed(1) + '%' };
+    });
+
+    $('trend-plot').innerHTML =
+      gridLines.map(function (g) {
+        return '<div class="grid-label" style="top: ' + g.top + '">' + g.label + '</div>';
+      }).join('') +
+      '<svg viewBox="0 0 ' + W + ' ' + H + '" aria-hidden="true">' +
+        gridLines.map(function (g) {
+          return '<line x1="0" y1="' + g.y + '" x2="' + W + '" y2="' + g.y + '" stroke="var(--widget-border)" stroke-width="1"></line>';
+        }).join('') +
+        '<polyline points="' + points + '" fill="none" stroke="var(--primary)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"></polyline>' +
+        '<circle cx="' + lastX + '" cy="' + lastY + '" r="3.5" fill="var(--primary)"></circle>' +
+      '</svg>';
+
+    text('trend-range', series.length + ' days');
+    text('trend-first-date', series[0].date);
+    text('trend-last-date', series[series.length - 1].date);
+    text('spark-from', shortDate(series[0].date));
+    text('spark-to', shortDate(series[series.length - 1].date));
+  }
+
+  function renderMovers() {
+    var movers = state.repos
+      .filter(function (r) { return r.totalDelta !== null && Math.abs(r.totalDelta) >= 0.05; })
+      .sort(function (a, b) { return Math.abs(b.totalDelta) - Math.abs(a.totalDelta); })
+      .slice(0, 4);
+
+    $('movers').innerHTML = movers.map(function (r) {
+      var color = r.totalDelta > 0 ? 'var(--ls-green)' : 'var(--status-error)';
+      var delta = (r.totalDelta > 0 ? '▲ +' : '▼ ') + r.totalDelta.toFixed(2) + '%';
+      return '<div class="mover">' +
+        '<div class="mover-text">' +
+          '<div class="mover-name">' + esc(r.name) + '</div>' +
+          '<div class="mover-cur">' + r.pct.toFixed(1) + '% current</div>' +
+        '</div>' +
+        '<div class="mover-delta" style="color: ' + color + '">' + delta + '</div>' +
+      '</div>';
+    }).join('');
+
+    show('movers-empty', state.loaded && movers.length === 0);
+  }
+
+  $('copy-btn').addEventListener('click', onCopy);
+  render();
+  load();
+})();
 </script>
 </body>
 </html>
