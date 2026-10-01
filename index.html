@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>LegalSifter Coverage</title>
+<title>LegalSifter Repo Coverage</title>
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;500;600;700&display=swap" />
@@ -140,7 +140,7 @@ a:hover { color: var(--primary-hover); text-decoration: underline; }
 
 /* ── Layout ── */
 main {
-  max-width: 1440px;
+  max-width: 1180px;
   margin: 0 auto;
   padding: 28px 32px 56px;
   display: flex;
@@ -176,24 +176,6 @@ main {
   font-size: 13px;
   color: var(--brand-red);
 }
-.banner-gap {
-  display: flex;
-  align-items: flex-start;
-  gap: 14px;
-  background: var(--accent);
-  border: 1px solid var(--warm-gray-1);
-  border-radius: var(--radius-xl);
-  padding: 16px 20px;
-}
-.banner-gap svg { flex-shrink: 0; margin-top: 1px; }
-.banner-text { display: flex; flex-direction: column; gap: 3px; }
-.banner-headline {
-  font-size: 14px;
-  font-weight: var(--fw-semibold);
-  color: var(--fg-strong);
-  line-height: 1.4;
-}
-.banner-sub { font-size: 13px; color: var(--fg-light); line-height: 1.5; }
 
 /* ── Stat cards ── */
 .stat-grid { display: grid; grid-template-columns: 1.7fr 1fr 1fr 1fr; gap: 16px; }
@@ -227,7 +209,7 @@ main {
 .comp-legend {
   display: flex;
   flex-wrap: wrap;
-  gap: 6px 18px;
+  gap: 5px 14px;
   font-size: 11px;
   color: var(--fg-light);
 }
@@ -266,7 +248,7 @@ main {
 
 .row-grid {
   display: grid;
-  grid-template-columns: minmax(160px, 1.4fr) 78px minmax(120px, 1.6fr) 86px 112px 150px;
+  grid-template-columns: minmax(190px, 260px) 84px 120px 96px minmax(200px, 1fr) 150px;
   gap: 16px;
   align-items: center;
 }
@@ -285,7 +267,7 @@ main {
   align-items: center;
   justify-content: space-between;
   gap: 6px;
-  width: 104px;
+  width: 200px;
   font-size: 9.5px;
   color: var(--spark-axis-text);
   letter-spacing: 0.02em;
@@ -301,7 +283,8 @@ main {
 }
 .svc-row:hover { background: var(--bg); }
 .svc-name { display: flex; align-items: center; gap: 9px; min-width: 0; }
-.svc-name span:last-child {
+.svc-name .repo-name {
+  min-width: 0;
   font-size: 13.5px;
   font-weight: var(--fw-semibold);
   color: var(--fg-strong);
@@ -329,18 +312,20 @@ main {
 .svc-source { font-size: 10.5px; }
 
 .missing-block { padding: 20px 4px 16px; }
-.missing-head { display: flex; align-items: baseline; gap: 8px; margin-bottom: 12px; }
+.missing-head { display: flex; align-items: baseline; gap: 8px; margin-bottom: 4px; }
+.missing-note { font-size: 12px; color: var(--fg-light); line-height: 1.5; margin-bottom: 12px; }
 .missing-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 8px; }
 .missing-item {
-  display: flex;
+  display: grid;
+  grid-template-columns: 1fr auto;
   align-items: center;
-  justify-content: space-between;
-  gap: 10px;
+  gap: 3px 8px;
   background: var(--bg);
   border: 1px solid var(--warm-white);
   border-radius: var(--radius-md);
   padding: 9px 12px;
 }
+.missing-item .tag { grid-column: 1 / -1; }
 .missing-item .name {
   font-size: 12.5px;
   font-weight: var(--fw-medium);
@@ -401,11 +386,57 @@ main {
 
 .footnote { font-size: 11px; color: var(--gray-500); line-height: 1.6; }
 
+/* ── Stack chips ── */
+.stack-chip {
+  font-size: 10px;
+  font-weight: var(--fw-semibold);
+  letter-spacing: 0.03em;
+  padding: 1px 6px;
+  border-radius: var(--radius-sm);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.stack-Go         { background: rgba(65, 182, 230, 0.16); color: #1B6F91; }
+.stack-Java       { background: rgba(237, 110, 36, 0.14); color: #A24A12; }
+.stack-TypeScript { background: rgba(102, 56, 182, 0.12); color: #553099; }
+
+/* ── Controls ── */
+.controls { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.control-group { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+.control-label {
+  font-size: 10px;
+  font-weight: var(--fw-bold);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--gray-500);
+  margin-right: 2px;
+}
+.sort-select {
+  font-family: var(--font-sans);
+  font-size: 12px;
+  font-weight: var(--fw-semibold);
+  color: var(--fg-light);
+  background: var(--widget);
+  border: 1px solid var(--gray-300);
+  border-radius: var(--radius-md);
+  padding: 5px 9px;
+  cursor: pointer;
+}
+
+/* ── Measurement age ── */
+.svc-age { font-size: 10.5px; }
+.svc-flag { font-size: 10.5px; color: var(--gray-500); }
+.age-ok    { color: var(--ls-green); }
+.age-aging { color: var(--fg-lighter); }
+.age-stale { color: var(--status-warning); }
+.age-cold  { color: var(--status-error); }
+
+
 /* ── Narrow viewports ── */
 @media (max-width: 1100px) {
   .stat-grid { grid-template-columns: 1fr 1fr; }
   .bottom-grid { grid-template-columns: 1fr; }
-  .row-grid { grid-template-columns: minmax(140px, 1.4fr) 70px 86px 104px 120px; }
+  .row-grid { grid-template-columns: minmax(160px, 1fr) 80px 96px 200px 140px; }
   .row-grid > .against-target, .row-grid > .th-against { display: none; }
 }
 @media (max-width: 760px) {
@@ -422,14 +453,14 @@ main {
 
 <header class="app-header">
   <div class="brand">
-    <svg class="brand-mark" width="26" height="26" viewBox="0 0 24 24" aria-hidden="true">
-      <circle cx="7" cy="8" r="4.4" fill="var(--ls-purple)"></circle>
-      <circle cx="15.5" cy="8" r="4.4" fill="var(--ls-orange)"></circle>
-      <circle cx="11.25" cy="15.5" r="4.4" fill="var(--ls-green)"></circle>
+    <svg class="brand-mark" width="24" height="24" viewBox="0 0 1024 1024" fill="none" role="img" aria-label="LegalSifter">
+      <path d="M475.291 575.485H370.958V870.397L166.158 931.837L0 317.437L372.891 204.797L475.291 575.485Z" fill="var(--ls-purple)"/>
+      <path d="M1006.61 610.305H403.805V1021.95H1006.61V610.305Z" fill="var(--ls-orange)"/>
+      <path d="M629.857 575.488H508.137L396.076 161.792L274.355 198.656L293.676 0L680.091 40.96L629.857 575.488Z" fill="var(--ls-green)"/>
     </svg>
     <div class="brand-text">
-      <div class="brand-title">Coverage</div>
-      <div class="brand-sub">Microservice unit test coverage</div>
+      <div class="brand-title">LegalSifter Repo Coverage</div>
+      <div class="brand-sub">Unit test line coverage, collected nightly from CI</div>
     </div>
   </div>
   <div class="header-actions">
@@ -448,22 +479,13 @@ main {
 
   <div class="banner-error" id="error" role="alert" hidden></div>
 
-  <div class="banner-gap" id="gap-banner" hidden>
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--action-add-comment)" stroke-width="2" stroke-linecap="round" aria-hidden="true">
-      <circle cx="12" cy="12" r="9"></circle><path d="M12 8v4.5"></path><path d="M12 16h.01"></path>
-    </svg>
-    <div class="banner-text">
-      <div class="banner-headline" id="gap-headline"></div>
-      <div class="banner-sub">Coverage is healthy where it is measured. The instrumentation gap is the largest item on this board.</div>
-    </div>
-  </div>
 
   <section class="stat-grid">
     <div class="card stat-composition">
-      <div class="eyebrow">Fleet composition</div>
+      <div class="eyebrow">Repositories reporting</div>
       <div class="stat-line">
         <div class="stat-hero" id="reporting-count">&mdash;</div>
-        <div class="stat-caption">of <span id="total-count">&mdash;</span> services reporting</div>
+        <div class="stat-caption">of <span id="total-count">&mdash;</span> tracked</div>
       </div>
       <div class="comp-bar">
         <div id="comp-green" style="background: var(--status-success)"></div>
@@ -473,46 +495,59 @@ main {
       </div>
       <div class="comp-legend">
         <div><span class="dot" style="background: var(--status-success)"></span>At target <span id="n-green-legend"></span></div>
-        <div><span class="dot" style="background: var(--status-warning)"></span>60&ndash;<span id="target-minus"></span>% <span id="n-amber"></span></div>
-        <div><span class="dot" style="background: var(--status-error)"></span>Below 60% <span id="n-red"></span></div>
-        <div><span class="dot" style="background: var(--warm-gray-1)"></span>No data <span id="n-na"></span></div>
+        <div><span class="dot" style="background: var(--status-warning)"></span><span id="amber-label"></span> <span id="n-amber"></span></div>
+        <div><span class="dot" style="background: var(--status-error)"></span>Under 60% <span id="n-red"></span></div>
+        <div><span class="dot" style="background: var(--warm-gray-1)"></span>No coverage <span id="n-na"></span></div>
       </div>
     </div>
 
     <div class="card">
-      <div class="eyebrow">Fleet average</div>
+      <div class="eyebrow">Average coverage</div>
       <div class="stat-num" id="fleet-avg">&mdash;</div>
-      <div class="stat-note">across reporting services</div>
+      <div class="stat-note">unweighted mean of reporting repos</div>
     </div>
 
     <div class="card">
-      <div class="eyebrow">Meeting target</div>
+      <div class="eyebrow">At or above target</div>
       <div class="stat-line">
         <div class="stat-num" id="n-green">&mdash;</div>
         <div class="stat-denom">/ <span id="reporting-denom"></span></div>
       </div>
-      <div class="stat-note">threshold <span id="target-label"></span></div>
+      <div class="stat-note" id="target-note"></div>
     </div>
 
     <div class="card">
-      <div class="eyebrow">Below target</div>
-      <div class="stat-num" id="below-count">&mdash;</div>
-      <div class="stat-note" id="below-sub"></div>
+      <div class="eyebrow">Stale measurements</div>
+      <div class="stat-num" id="stale-count">&mdash;</div>
+      <div class="stat-note" id="stale-sub"></div>
     </div>
   </section>
 
   <section class="card panel">
     <div class="panel-head">
       <div class="panel-title">
-        <span class="eyebrow">Services</span>
+        <span class="eyebrow">Repositories</span>
         <span class="count" id="service-count"></span>
       </div>
-      <div class="filters" id="filters"></div>
+      <div class="controls">
+        <div class="control-group" id="filters" role="group" aria-label="Filter by coverage band"></div>
+        <div class="control-group" id="stack-filters" role="group" aria-label="Filter by stack"></div>
+        <div class="control-group">
+          <label class="control-label" for="sort">Sort</label>
+          <select class="sort-select" id="sort">
+            <option value="cov-asc">Coverage, lowest first</option>
+            <option value="cov-desc">Coverage, highest first</option>
+            <option value="stale">Least recently measured</option>
+            <option value="stack">Stack</option>
+            <option value="name">Name</option>
+          </select>
+        </div>
+      </div>
     </div>
 
     <div id="table" hidden>
       <div class="row-grid table-head">
-        <div class="th">Service</div>
+        <div class="th">Repository</div>
         <div class="th right">Coverage</div>
         <div class="th th-against">Against target</div>
         <div class="th right">Change</div>
@@ -531,19 +566,20 @@ main {
 
     <div class="missing-block" id="missing-block" hidden>
       <div class="missing-head">
-        <span class="eyebrow">No coverage artifact</span>
+        <span class="eyebrow">No coverage reported</span>
         <span class="count" id="missing-count"></span>
       </div>
+      <div class="missing-note" id="missing-note"></div>
       <div class="missing-grid" id="missing"></div>
     </div>
 
-    <div class="empty" id="empty-filter" hidden>No services in this band.</div>
+    <div class="empty" id="empty-filter" hidden>No repositories match this filter.</div>
   </section>
 
   <section class="bottom-grid">
     <div class="card trend-card" id="trend-card" hidden>
       <div class="trend-head">
-        <div class="eyebrow">Fleet average over time</div>
+        <div class="eyebrow">Average coverage over time</div>
         <div class="count" id="trend-range"></div>
       </div>
       <div class="trend-plot" id="trend-plot"></div>
@@ -555,15 +591,19 @@ main {
 
     <div class="card movers-card">
       <div class="movers-head">
-        <div class="eyebrow">Movers</div>
-        <div class="count">Change since first recorded</div>
+        <div class="eyebrow">Biggest movers</div>
+        <div class="count">Change since tracking began</div>
       </div>
       <div id="movers"></div>
-      <div class="movers-empty" id="movers-empty" hidden>No coverage has moved since tracking began.</div>
+      <div class="movers-empty" id="movers-empty" hidden>No repository has moved since tracking began.</div>
     </div>
   </section>
 
-  <div class="footnote">Icons shown are stand-ins &mdash; production should use FontAwesome Pro.</div>
+  <div class="footnote">
+    Coverage is read from each repository&rsquo;s most recent CI coverage artifact. GitHub expires
+    artifacts after 30 days; once that happens the last known value is carried forward and labelled
+    as such. &ldquo;Last measured&rdquo; is when CI produced the number, not when this page collected it.
+  </div>
 </main>
 
 <script>
@@ -576,16 +616,33 @@ main {
   ];
 
   var CONFIG = {
-    target: 80,
-    sortBy: 'Lowest coverage first', // 'Highest coverage first' | 'Name'
+    target: 80,          // coverage % a repo is expected to meet
+    staleAfterDays: 14,  // a measurement older than this counts as stale
     showTrend: true
   };
+
+  // Stack per repository, mirroring the parser dispatch in collect_coverage.py:
+  // JaCoCo reports come from the Java services, Istanbul coverage-summary.json from
+  // the TypeScript apps, and everything else is parsed as Go cover HTML.
+  var STACKS = {
+    'LegalSifter/ms-auth': 'Java',
+    'LegalSifter/ms-profile': 'Java',
+    'LegalSifter/ms-project': 'Java',
+    'LegalSifter/ms-storage': 'Java',
+    'LegalSifter/ls-review-fe': 'TypeScript',
+    'LegalSifter/control-bff': 'TypeScript',
+    'LegalSifter/ReviewPro-GoogleDocsAddIn': 'TypeScript',
+    'LegalSifter/reviewpro-onlyoffice': 'TypeScript'
+  };
+  var DEFAULT_STACK = 'Go';
+  var STACK_ORDER = ['Go', 'Java', 'TypeScript'];
 
   var state = {
     loaded: false,
     error: null,
-    filter: 'all',
-    copied: false,
+    band: 'all',
+    stack: 'all',
+    sort: 'cov-asc',
     repos: [],
     lastDate: '',
     avgSeries: []
@@ -599,6 +656,39 @@ main {
     return String(s).replace(/[&<>"]/g, function (c) {
       return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c];
     });
+  }
+
+  function daysBetween(fromIso, toIso) {
+    if (!fromIso || !toIso) return null;
+    var a = new Date(fromIso + 'T00:00:00'), b = new Date(toIso + 'T00:00:00');
+    if (isNaN(a) || isNaN(b)) return null;
+    return Math.round((b - a) / 86400000);
+  }
+
+  // Compact age for table cells: "today", "6d", "22d", "10mo".
+  function ageShort(days) {
+    if (days === null) return '';
+    if (days <= 0) return 'today';
+    if (days < 60) return days + 'd';
+    return Math.round(days / 30.44) + 'mo';
+  }
+
+  // Spelled-out age for prose: "today", "1 day", "22 days", "10 months".
+  function ageLong(days) {
+    if (days === null) return '';
+    if (days <= 0) return 'today';
+    if (days === 1) return '1 day';
+    if (days < 60) return days + ' days';
+    var mo = Math.round(days / 30.44);
+    return mo + (mo === 1 ? ' month' : ' months');
+  }
+
+  function ageClass(days) {
+    if (days === null) return 'age-aging';
+    if (days <= 7) return 'age-ok';
+    if (days <= CONFIG.staleAfterDays) return 'age-aging';
+    if (days <= 30) return 'age-stale';
+    return 'age-cold';
   }
 
   /* ── Data ───────────────────────────────────────────────────────────── */
@@ -625,21 +715,29 @@ main {
     var iRepo = head.indexOf('repo');
     var iPct = head.indexOf('coverage_pct');
     var iSrc = head.indexOf('source');
+    var iPushed = head.indexOf('repo_pushed_at');
+    var iMeasured = head.indexOf('measured_on');
+    var iBranch = head.indexOf('measured_branch');
+
+    var cell = function (cols, idx) { return idx >= 0 ? (cols[idx] || '').trim() : ''; };
 
     var byRepo = {};
     var dateSet = {};
     for (var n = 1; n < lines.length; n++) {
       var c = lines[n].split(',');
       if (c.length < 2) continue;
-      var repo = (c[iRepo] || '').trim();
+      var repo = cell(c, iRepo);
       if (!repo) continue;
-      var date = (c[iDate] || '').trim();
-      var raw = (c[iPct] || '').trim();
+      var date = cell(c, iDate);
+      var raw = cell(c, iPct);
       dateSet[date] = true;
       (byRepo[repo] = byRepo[repo] || []).push({
         date: date,
         pct: raw === '' ? null : parseFloat(raw),
-        source: (c[iSrc] || '').trim()
+        source: cell(c, iSrc),
+        pushedAt: cell(c, iPushed),
+        measuredOn: cell(c, iMeasured),
+        branch: cell(c, iBranch)
       });
     }
 
@@ -663,12 +761,22 @@ main {
         deltaDays = Math.round((new Date(cur.date) - new Date(ref.date)) / 86400000);
       }
       var first = withPct.length ? withPct[0].pct : null;
+
+      // measured_on is a recent addition to the CSV; fall back to the collection
+      // date so rows written before it existed still place on the timeline.
+      var measuredOn = cur.measuredOn || null;
+
       return {
         full: full,
         name: full.indexOf('/') >= 0 ? full.split('/')[1] : full,
+        stack: STACKS[full] || DEFAULT_STACK,
         pct: cur.pct,
         date: cur.date,
         source: cur.source,
+        branch: cur.branch,
+        measuredOn: measuredOn,
+        measuredAge: daysBetween(measuredOn, lastDate),
+        pushedAge: daysBetween(cur.pushedAt, lastDate),
         delta: delta,
         deltaDays: deltaDays,
         totalDelta: cur.pct !== null && first !== null && withPct.length > 1 ? cur.pct - first : null,
@@ -712,6 +820,10 @@ main {
       : 'var(--warm-gray-1)';
   }
 
+  function isStale(r) {
+    return r.pct !== null && r.measuredAge !== null && r.measuredAge > CONFIG.staleAfterDays;
+  }
+
   function shortDate(iso) {
     if (!iso) return '';
     var d = new Date(iso + 'T00:00:00');
@@ -719,11 +831,11 @@ main {
     return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
   }
 
-  // Sparkline geometry. The Y range zooms to mean ± 1 SD so sub-1% moves stay visible,
-  // then widens to cover any point outside that band.
+  // Sparkline geometry. The Y range zooms to mean +/- 1 SD so sub-1% moves stay
+  // visible, then widens to cover any point outside that band.
   function spark(hist) {
     if (!hist || hist.length < 2) return null;
-    var W = 104, H = 26, P = 4.5, n = hist.length;
+    var W = 200, H = 26, P = 4.5, n = hist.length;
     var mean = hist.reduce(function (a, b) { return a + b; }, 0) / n;
     var sd = Math.sqrt(hist.reduce(function (a, b) { return a + (b - mean) * (b - mean); }, 0) / n);
     var lo = Math.min(Math.min.apply(null, hist), mean - sd);
@@ -750,13 +862,13 @@ main {
 
   function sparkSvg(sp) {
     var band = sp.hasBand
-      ? '<rect x="1" y="' + sp.bandY + '" width="102" height="' + sp.bandH + '" fill="var(--fg-strong)" fill-opacity="0.09"></rect>'
+      ? '<rect x="1" y="' + sp.bandY + '" width="198" height="' + sp.bandH + '" fill="var(--fg-strong)" fill-opacity="0.09"></rect>'
       : '';
     var extremes = sp.showExtremes
       ? '<circle cx="' + sp.minX + '" cy="' + sp.minY + '" r="1.3" fill="var(--gray-500)"></circle>' +
         '<circle cx="' + sp.maxX + '" cy="' + sp.maxY + '" r="1.3" fill="var(--gray-500)"></circle>'
       : '';
-    return '<svg viewBox="0 0 104 26" width="104" height="26" aria-hidden="true">' +
+    return '<svg viewBox="0 0 200 26" width="200" height="26" aria-hidden="true">' +
       band +
       '<polyline points="' + sp.points + '" fill="none" stroke="var(--fg)" stroke-width="1" stroke-linejoin="round" stroke-linecap="round"></polyline>' +
       extremes +
@@ -769,23 +881,28 @@ main {
   function onCopy() {
     var lines = state.repos.slice()
       .sort(function (a, b) { return a.name.localeCompare(b.name); })
-      .map(function (r) { return r.name + ': ' + (r.pct !== null ? r.pct.toFixed(1) + '%' : 'N/A'); })
+      .map(function (r) { return r.name + ': ' + (r.pct !== null ? r.pct.toFixed(1) + '%' : 'no coverage'); })
       .join('\n');
     var done = function () {
-      state.copied = true;
       text('copy-label', 'Copied');
-      setTimeout(function () {
-        state.copied = false;
-        text('copy-label', 'Copy numbers');
-      }, 2200);
+      setTimeout(function () { text('copy-label', 'Copy numbers'); }, 2200);
     };
     if (navigator.clipboard) navigator.clipboard.writeText(lines).then(done, done);
     else done();
   }
 
-  function setFilter(key) {
-    state.filter = key;
-    render();
+  function pillGroup(hostId, defs, active, onPick) {
+    var host = $(hostId);
+    host.innerHTML = '';
+    defs.forEach(function (d) {
+      var b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'filter';
+      b.textContent = d.label;
+      b.setAttribute('aria-pressed', String(active === d.key));
+      b.addEventListener('click', function () { onPick(d.key); render(); });
+      host.appendChild(b);
+    });
   }
 
   /* ── Render ─────────────────────────────────────────────────────────── */
@@ -797,7 +914,7 @@ main {
     show('error', !!state.error);
     if (state.error) text('error', state.error);
 
-    text('meta', state.loaded ? state.lastDate + ' · ' + repos.length + ' services' : 'Loading…');
+    text('meta', state.loaded ? state.lastDate + ' · ' + repos.length + ' repositories' : 'Loading…');
 
     var withPct = repos.filter(function (r) { return r.pct !== null; });
     var nGreen = withPct.filter(function (r) { return r.pct >= T; }).length;
@@ -806,11 +923,6 @@ main {
     var nNa = repos.length - withPct.length;
     var total = repos.length || 1;
     var avg = withPct.length ? withPct.reduce(function (a, r) { return a + r.pct; }, 0) / withPct.length : null;
-    var belowCount = withPct.length - nGreen;
-
-    // Gap banner
-    show('gap-banner', state.loaded && nNa > 0);
-    text('gap-headline', nNa + ' of ' + repos.length + ' services publish no coverage artifact.');
 
     // Composition
     text('reporting-count', withPct.length);
@@ -820,62 +932,79 @@ main {
     $('comp-red').style.width = (nRed / total * 100).toFixed(2) + '%';
     $('comp-na').style.width = (nNa / total * 100).toFixed(2) + '%';
     text('n-green-legend', nGreen);
-    text('target-minus', T - 1);
+    text('amber-label', '60–' + (T - 1) + '%');
     text('n-amber', nAmber);
     text('n-red', nRed);
     text('n-na', nNa);
 
-    // Fleet average
     text('fleet-avg', avg === null ? '—' : avg.toFixed(1) + '%');
 
-    // Meeting target
+    // At or above target
     text('n-green', nGreen);
     $('n-green').style.color = nGreen === withPct.length && withPct.length > 0 ? 'var(--status-success)'
       : nGreen >= withPct.length * 0.7 ? 'var(--status-warning)'
       : 'var(--status-error)';
     text('reporting-denom', withPct.length);
-    text('target-label', '≥ ' + T + '%');
+    text('target-note', 'target is ' + T + '% line coverage');
 
-    // Below target
-    text('below-count', belowCount);
-    $('below-count').style.color = belowCount > 0 ? 'var(--status-error)' : 'var(--status-success)';
-    text('below-sub', nRed > 0 ? nRed + ' below 60%' : 'none critical');
+    // Stale measurements
+    var staleRepos = withPct.filter(isStale);
+    var oldest = staleRepos.reduce(function (m, r) { return Math.max(m, r.measuredAge); }, 0);
+    text('stale-count', staleRepos.length);
+    $('stale-count').style.color = staleRepos.length === 0 ? 'var(--status-success)'
+      : staleRepos.length > withPct.length / 2 ? 'var(--status-error)'
+      : 'var(--status-warning)';
+    text('stale-sub', staleRepos.length === 0
+      ? 'all measured within ' + CONFIG.staleAfterDays + 'd'
+      : 'over ' + CONFIG.staleAfterDays + 'd old · oldest ' + ageShort(oldest));
 
-    // Filters
-    var filterDefs = [
+    // Controls
+    pillGroup('filters', [
       { key: 'all', label: 'All' },
       { key: 'green', label: '≥ ' + T + '%' },
       { key: 'warn', label: '60–' + (T - 1) + '%' },
       { key: 'red', label: '< 60%' },
-      { key: 'na', label: 'No data' }
-    ];
-    var filters = $('filters');
-    filters.innerHTML = '';
-    filterDefs.forEach(function (f) {
-      var b = document.createElement('button');
-      b.type = 'button';
-      b.className = 'filter';
-      b.textContent = f.label;
-      b.setAttribute('aria-pressed', String(state.filter === f.key));
-      b.addEventListener('click', function () { setFilter(f.key); });
-      filters.appendChild(b);
+      { key: 'na', label: 'No coverage' }
+    ], state.band, function (k) { state.band = k; });
+
+    var stackDefs = [{ key: 'all', label: 'All stacks' }];
+    STACK_ORDER.forEach(function (st) {
+      var n = repos.filter(function (r) { return r.stack === st; }).length;
+      if (n) stackDefs.push({ key: st, label: st + ' ' + n });
     });
+    pillGroup('stack-filters', stackDefs, state.stack, function (k) { state.stack = k; });
+
+    $('sort').value = state.sort;
 
     // Rows
     var pass = function (r) {
+      if (state.stack !== 'all' && r.stack !== state.stack) return false;
       var b = bandOf(r.pct);
-      if (state.filter === 'all') return true;
-      if (state.filter === 'na') return b === 'na';
-      return b === state.filter;
+      if (state.band === 'all') return true;
+      if (state.band === 'na') return b === 'na';
+      return b === state.band;
     };
 
     var reportingRows = repos.filter(function (r) { return r.pct !== null && pass(r); });
-    if (CONFIG.sortBy === 'Highest coverage first') reportingRows.sort(function (a, b) { return b.pct - a.pct; });
-    else if (CONFIG.sortBy === 'Name') reportingRows.sort(function (a, b) { return a.name.localeCompare(b.name); });
+    var byName = function (a, b) { return a.name.localeCompare(b.name); };
+    if (state.sort === 'cov-desc') reportingRows.sort(function (a, b) { return b.pct - a.pct; });
+    else if (state.sort === 'name') reportingRows.sort(byName);
+    else if (state.sort === 'stale') reportingRows.sort(function (a, b) {
+      var aa = a.measuredAge === null ? -1 : a.measuredAge;
+      var bb = b.measuredAge === null ? -1 : b.measuredAge;
+      return bb - aa || byName(a, b);
+    });
+    else if (state.sort === 'stack') reportingRows.sort(function (a, b) {
+      return STACK_ORDER.indexOf(a.stack) - STACK_ORDER.indexOf(b.stack) || a.pct - b.pct;
+    });
     else reportingRows.sort(function (a, b) { return a.pct - b.pct; });
 
     var missingRows = repos.filter(function (r) { return r.pct === null && pass(r); })
-      .sort(function (a, b) { return a.name.localeCompare(b.name); });
+      .sort(function (a, b) {
+        var aa = a.pushedAge === null ? 1e9 : a.pushedAge;
+        var bb = b.pushedAge === null ? 1e9 : b.pushedAge;
+        return aa - bb || byName(a, b);
+      });
 
     text('service-count', (reportingRows.length + missingRows.length) + ' of ' + repos.length);
 
@@ -888,7 +1017,7 @@ main {
         : r.deltaDays >= 28 ? '30d'
         : r.deltaDays >= 13 ? '2w'
         : r.deltaDays + 'd';
-      // A change inside the flat band prints as +0.0, never -0.0.
+      // A change inside the flat band prints as 0.0, never -0.0.
       var delta = d === null ? '—'
         : d > 0.05 ? '↑ +' + d.toFixed(1) + '%' + (period ? ' ' + period : '')
         : d < -0.05 ? '↓ ' + d.toFixed(1) + '%' + (period ? ' ' + period : '')
@@ -897,11 +1026,20 @@ main {
         : d > 0.05 ? 'var(--ls-green)'
         : d < -0.05 ? 'var(--status-error)'
         : 'var(--gray-500)';
-      var source = r.source === 'fresh' ? 'fresh' : r.source === 'carried_forward' ? 'carried forward' : r.source;
-      var sourceColor = r.source === 'fresh' ? 'var(--ls-green)' : 'var(--gray-500)';
+
+      var when = r.measuredOn
+        ? '<div class="svc-date">' + esc(r.measuredOn) + '</div>' +
+          '<div class="svc-age ' + ageClass(r.measuredAge) + '">' + ageShort(r.measuredAge) + ' ago' +
+          (r.source === 'carried_forward' ? ' · carried forward' : '') + '</div>'
+        : '<div class="svc-date">' + esc(r.date) + '</div>' +
+          '<div class="svc-flag">' + (r.source === 'carried_forward' ? 'carried forward' : esc(r.source || '')) + '</div>';
 
       return '<div class="row-grid svc-row">' +
-        '<div class="svc-name"><span class="svc-dot" style="background: ' + color + '"></span><span>' + esc(r.name) + '</span></div>' +
+        '<div class="svc-name">' +
+          '<span class="svc-dot" style="background: ' + color + '"></span>' +
+          '<span class="repo-name">' + esc(r.name) + '</span>' +
+          '<span class="stack-chip stack-' + r.stack + '">' + r.stack + '</span>' +
+        '</div>' +
         '<div class="svc-pct">' + r.pct.toFixed(1) + '%</div>' +
         '<div class="against-target meter">' +
           '<div class="meter-fill" style="width: ' + Math.min(100, r.pct).toFixed(1) + '%; background: ' + color + '"></div>' +
@@ -909,17 +1047,22 @@ main {
         '</div>' +
         '<div class="svc-delta" style="color: ' + deltaColor + '">' + delta + '</div>' +
         '<div class="svc-spark">' + (sp ? sparkSvg(sp) : '<span class="no-spark">no history</span>') + '</div>' +
-        '<div class="svc-when">' +
-          '<div class="svc-date">' + esc(r.date) + '</div>' +
-          '<div class="svc-source" style="color: ' + sourceColor + '">' + esc(source) + '</div>' +
-        '</div>' +
+        '<div class="svc-when">' + when + '</div>' +
       '</div>';
     }).join('');
 
     show('missing-block', missingRows.length > 0);
     text('missing-count', missingRows.length);
+    text('missing-note', nNa + ' of ' + repos.length + ' repositories publish no coverage artifact at all. '
+      + 'Coverage is strong where it is measured, so these are the larger unknown — ordered by how '
+      + 'recently each was pushed, since an untested repo under active development is the sharper risk.');
     $('missing').innerHTML = missingRows.map(function (r) {
-      return '<div class="missing-item"><span class="name">' + esc(r.name) + '</span><span class="tag">no artifact</span></div>';
+      var pushed = r.pushedAge === null ? 'push date unknown' : 'pushed ' + ageLong(r.pushedAge) + ' ago';
+      return '<div class="missing-item">' +
+        '<span class="name">' + esc(r.name) + '</span>' +
+        '<span class="stack-chip stack-' + r.stack + '">' + r.stack + '</span>' +
+        '<span class="tag ' + ageClass(r.pushedAge) + '">' + pushed + '</span>' +
+      '</div>';
     }).join('');
 
     show('empty-filter', state.loaded && reportingRows.length === 0 && missingRows.length === 0);
@@ -984,7 +1127,7 @@ main {
       return '<div class="mover">' +
         '<div class="mover-text">' +
           '<div class="mover-name">' + esc(r.name) + '</div>' +
-          '<div class="mover-cur">' + r.pct.toFixed(1) + '% current</div>' +
+          '<div class="mover-cur">' + r.pct.toFixed(1) + '% now</div>' +
         '</div>' +
         '<div class="mover-delta" style="color: ' + color + '">' + delta + '</div>' +
       '</div>';
@@ -994,6 +1137,7 @@ main {
   }
 
   $('copy-btn').addEventListener('click', onCopy);
+  $('sort').addEventListener('change', function (e) { state.sort = e.target.value; render(); });
   render();
   load();
 })();
