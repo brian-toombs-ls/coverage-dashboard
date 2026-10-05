@@ -17,6 +17,14 @@
 - `LegalSifter/api-notifications`
 - `LegalSifter/ak-ml-data-py`
 
+### Blocked on shared CI
+- `LegalSifter/ms-project` — Java/JaCoCo. Reports `unavailable` and never has: no run in its
+  history uploads any artifact, because shared `ci_actions/.github/workflows/java.yml@develop`
+  has no report-upload step (the Go workflow in that same repo does). Fixing it needs a PR
+  against `ci_actions` — shared infra touching every Java service — then a `workflow_dispatch`
+  here. Weigh that against the repo being dormant since 2025-12-09; if it is decommissioned,
+  drop it from `REPOSITORIES` instead.
+
 ### No test infrastructure (skip)
 - `LegalSifter/ReviewPro-iOS` — Swift, no coverage artifacts
 - `LegalSifter/reviewpro-libreoffice`
@@ -40,6 +48,12 @@
 - Consider filtering `workflow_runs` by `workflow_id` for repos where we know the exact workflow name, to avoid scanning Lint/Build/Security/Sigrid runs with no artifacts.
 
 ### New formats
+- Go `coverage.out` profile parser — **done**. `api-settings`, `automator` and `go-mail` publish
+  a `Unit Test Reports` artifact whose HTML is raw `go tool cover -html` output: per-file
+  percentages in a dropdown, no total anywhere, so `extract_gocov` found nothing and all three
+  recorded `unavailable`. The artifacts also carry `coverage.out`, which is read instead and
+  summed to exact statement coverage. Repos whose artifact has a gocov-html report
+  (`ms-billing`, `api-documents`, `ms-chat`) carry no `coverage.out` and are unaffected.
 - Python `coverage.xml` parser for `ls-pipeline_refactored-python` — parse `<coverage line-rate="0.83">` attribute, multiply by 100.
 
 ---

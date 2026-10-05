@@ -161,6 +161,29 @@ def istanbul_line_counts(json_bytes):
         return None
 
 
+def extract_go_profile(text):
+    """Statement coverage from a Go `coverage.out` profile.
+
+    Each body line is `file:startLine.col,endLine.col numStatements hitCount`.
+    This is the same arithmetic `go tool cover -func` reports as "total", and
+    it is read in preference to the HTML report: `go tool cover -html` output
+    carries only per-file percentages in a dropdown, with no total anywhere.
+    """
+    covered = total = 0
+    for line in text.splitlines():
+        parts = line.split()
+        if len(parts) != 3 or ":" not in parts[0]:
+            continue
+        try:
+            statements, hits = int(parts[1]), int(parts[2])
+        except ValueError:
+            continue
+        total += statements
+        if hits > 0:
+            covered += statements
+    return round(100.0 * covered / total, 2) if total else None
+
+
 def extract_gocov(html):
     patterns = [
         r'<div\s+id=["\']totalcov["\'][^>]*>\s*(\d+(?:\.\d+)?)\s*%\s*</div>',
@@ -217,6 +240,15 @@ def coverage_from_zip(zip_bytes, repo):
             for name in names:
                 if "jacoco" in name.lower() and name.endswith("index.html"):
                     pct = extract_jacoco(zf.read(name).decode("utf-8", errors="ignore"))
+                    if pct is not None:
+                        return pct
+
+        # Go coverage profile: exact counts, and present whether or not the
+        # run also produced a parseable HTML report.
+        if not is_jacoco and not is_istanbul:
+            for name in names:
+                if name.endswith(".out") and "coverage" in name.lower():
+                    pct = extract_go_profile(zf.read(name).decode("utf-8", errors="ignore"))
                     if pct is not None:
                         return pct
 
